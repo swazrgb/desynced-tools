@@ -23,7 +23,7 @@ type Value = number & {
   /**
    * Gets the resource type from an resource node
    */
-  resourceType?: Value;
+  resourceType: [boolean, Value];
   /**
    * Gets the trust level of the unit towards you
    */
@@ -119,7 +119,7 @@ type Value = number & {
    * Attempt to solve explorable with inventory items
    * @returns Missing repair item, scanner component or Unpowered
    */
-  solve(): Value | undefined;
+  solve(): [boolean, Value];
 }
 
 /**
@@ -162,6 +162,11 @@ declare function getType(item_entity: Value): Value;
  * @returns The first locked item id with no item
  */
 declare function getFirstLocked0(): Value;
+/**
+ * Branches based on which unit is closer, optional branches for closer unit
+ * @returns Closest unit
+ */
+declare function selectNearest(unit_a: Value, unit_b: Value): ["next" | "A" | "B", Value];
 /**
  * Performs code for all entities in visibility range of the unit
  * @param range Range (up to units visibility range)
@@ -209,7 +214,7 @@ declare function getCompReg(component_index: Value | CompNum, group_index?: Valu
  * @param group_index? Component group index if multiple are equipped
  * @returns Returns the component ID currently working
  */
-declare function isWorking(component_index: Value | CompNum, group_index?: Value | number): Value | undefined;
+declare function isWorking(component_index: Value | CompNum, group_index?: Value | number): [boolean, Value];
 /**
  * Sets the numerical/coordinate part of a value
  */
@@ -390,12 +395,12 @@ declare function getResourceNum(resource: Value): Value;
 /**
  * Reads the first item in your inventory
  */
-declare function firstInventoryItem(): Value | undefined;
+declare function firstInventoryItem(): [boolean, Value];
 /**
  * Reads the item contained in the specified slot index
  * @param index Slot index
  */
-declare function getInventoryItem(index: Value | number): Value | undefined;
+declare function getInventoryItem(index: Value | number): [boolean, Value];
 /**
  * Loops through Inventory
  * @returns [Item Inventory, Items reserved for outgoing order or recipe, Items available, Space reserved for an incoming order, Remaining space]
@@ -422,7 +427,7 @@ declare function isFixed(slot_index: Value | number): boolean;
  * @param component Component to check
  * @returns Returns how many instances of a component equipped on this Unit
  */
-declare function isEquipped(component: Value | Comp): Value | undefined;
+declare function isEquipped(component: Value | Comp): [boolean, Value];
 /**
  * Shuts down the power of the Unit
  */
@@ -519,7 +524,7 @@ declare function scout(): void;
  * @param filter_2? Second filter
  * @param filter_3? Third filter
  */
-declare function radar(filter_1?: Value | RadarFilter, filter_2?: Value | RadarFilter, filter_3?: Value | RadarFilter): Value | undefined;
+declare function radar(filter_1?: Value | RadarFilter, filter_2?: Value | RadarFilter, filter_3?: Value | RadarFilter): [boolean, Value];
 /**
  * Mines a single resource
  * @param resource Resource to Mine
@@ -560,7 +565,7 @@ declare function nighttime(): boolean;
  * @param item Item to count
  * @returns Number of this item in your faction
  */
-declare function factionItemAmount(item: Value | Item): Value | undefined;
+declare function factionItemAmount(item: Value | Item): [boolean, Value];
 /**
  * Attempts to reads the internal key of the unit
  * @param frame Structure to read the key for

@@ -164,7 +164,7 @@ export const instructions:{[key:string]:InstrInfo} = {
   },
   "select_nearest": {
     "js": "selectNearest",
-    "type": "operator",
+    "type": "function",
     "inArgs": [
       2,
       3

@@ -795,7 +795,8 @@ class Compiler {
     }
     let outDefs = typeof info.out === "number" ? [info.out] : info.out;
     outDefs?.forEach((v, i) => {
-      args[v] = outs[i] || nilReg;
+      // First out is reserved for control value if executing branching instructions
+      args[v] = outs[info.exec == null || info.loop ? i : i + 1] || nilReg;
     });
 
     if (info.exec != null) {
@@ -1219,7 +1220,7 @@ class Compiler {
         if (ts.isIdentifier(decl.name)) {
           this.compileExpr(decl.initializer, this.newVariable(decl.name));
         } else if (ts.isArrayBindingPattern(decl.name)) {
-          if (ts.isCallExpression(decl.initializer)) {
+          if (ts.isCallExpression(decl.initializer) || ts.isPropertyAccessExpression(decl.initializer)) {
             const outs = decl.name.elements.map((el) => {
               if (ts.isOmittedExpression(el)) {
                 return undefined;
@@ -1234,7 +1235,17 @@ class Compiler {
                 );
               }
             });
-            return this.compileCall(decl.initializer, outs);
+            if(ts.isCallExpression(decl.initializer)) {
+              return this.compileCall(decl.initializer, outs);
+            } else {
+              return this.compileResolvedCall(
+                decl,
+                decl.initializer.name.text,
+                decl.initializer.expression,
+                [],
+                outs
+              );
+            }
           } else {
             this.#error(
               "only call expression are valid for array initializer",
