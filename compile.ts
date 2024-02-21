@@ -43,15 +43,23 @@ const dynamicLabels = [
   "v_idle",
 ];
 
+function isInlinePredicate(n: ts.JSDocTag): n is ts.JSDocTag {
+  return n.getText().includes("@inline");
+}
+
 function compileFile(f: ts.SourceFile): string {
   const c = new Compiler();
   f.statements.forEach((n) => {
     if (ts.isFunctionDeclaration(n)) {
       let subName = (n.name as ts.Identifier).text;
-      if (c.subs.has(subName)) {
-        throw new Error("sub ${subName} declared multiple times");
+      const isInlined = ts.getAllJSDocTags(n, isInlinePredicate).length > 0;
+
+      const set = isInlined ? c.inlined : c.subs;
+
+      if (set.has(subName)) {
+        throw new Error(`${isInlined ? "sub" : "function"} ${subName} declared multiple times`);
       }
-      c.subs.set(subName, n);
+      set.set(subName, n);
     } else {
       throw new Error(`unsupported node ${n.kind} ${ts.SyntaxKind[n.kind]}`);
     }
@@ -81,16 +89,32 @@ class VariableScope {
   children: VariableScope[] = [];
   namedVariables = new Map<string, Variable>();
   anonymousVariables: Variable[] = [];
+  translator?: ScopeTranslator;
+  inlined: boolean = false;
 
-  newScope(): VariableScope {
+  newScope(inlined: boolean, translator: ScopeTranslator | undefined): VariableScope {
     let result = new VariableScope();
     result.parent = this;
+    result.translator = translator;
+    result.inlined = this.inlined || inlined;
     this.children.push(result);
     return result;
   }
 
+  private translate(name: string): string | undefined {
+    return this.translator != null ? this.translator(name) : name;
+  }
+
   has(name: string): boolean {
-    return this.namedVariables.has(name) || (this.parent?.has(name) ?? false);
+    if (this.namedVariables.has(name)) {
+      return true;
+    }
+    const translatedName = this.translate(name);
+    if (translatedName == null) {
+      return false;
+    }
+
+    return this.parent?.has(translatedName) ?? false;
   }
 
   new(name: string): Variable {
@@ -104,7 +128,7 @@ class VariableScope {
     if (!this.has(name)) {
       this.namedVariables.set(name, new Variable(reg));
     }
-    return this.namedVariables.get(name) || this.parent!.get(name);
+    return this.namedVariables.get(name) || this.parent!.get(this.translate(name)!);
   }
 
   newAnonymousVariable(): Variable {
@@ -144,6 +168,8 @@ class VariableScope {
   }
 }
 
+type ScopeTranslator = (s: string) => string | undefined;
+
 class FunctionScope {
   paramCounter = 0;
   program = new Code();
@@ -162,9 +188,12 @@ class FunctionScope {
     this.outputs.push(new Variable(reg));
   }
 
-  withNewVariableScope(f: () => undefined) {
+  withNewVariableScope(f: () => undefined, {translator, inlined = false}: {
+    translator?: ScopeTranslator,
+    inlined?: boolean
+  } = {}) {
     let scope = this.scope;
-    this.scope = this.scope.newScope();
+    this.scope = this.scope.newScope(inlined, translator);
     try {
       f();
     } finally {
@@ -200,6 +229,7 @@ function isMainFunction(f: ts.FunctionDeclaration): boolean {
 class Compiler {
   labelCounter = 0;
   dynamicLabelCounter = 0;
+  inlined = new Map<string, ts.FunctionDeclaration>();
   subs = new Map<string, ts.FunctionDeclaration>();
   functionScopes: FunctionScope[] = [];
   currentScope: FunctionScope = new FunctionScope();
@@ -289,6 +319,9 @@ class Compiler {
         this.compileIf(n);
       });
     } else if (ts.isReturnStatement(n)) {
+      if (this.currentScope.scope.inlined) {
+        this.#error("Return statement not supported in inlined functions. Use parameters instead", n);
+      }
       let values: ts.Expression[] = [];
       if (n.expression) {
         if (ts.isArrayLiteralExpression(n.expression)) {
@@ -868,6 +901,59 @@ class Compiler {
         } else {
           return new Variable(value);
         }
+      } else if (this.inlined.has(name)) {
+        // TODO inline!
+        // this.#emit(
+        //     methods.setReg,
+        //     new LiteralValue({num: 1}),
+        //     this.ref(outs[0], VariableOperations.Write)
+        // );
+        // this.compileInstructions()
+        const f = this.inlined.get(name);
+
+        // function argument names
+        const fParams = f?.parameters?.map(p => p.name.getText()) ?? [];
+        // call site argument names
+        const args = e.arguments.map(a => {
+          if (ts.isIdentifier(a)) {
+            return {variable: a.text};
+          } else if (ts.isStringLiteral(a)) {
+            return {id: a.text}
+          } else if (ts.isNumericLiteral(a)) {
+            return {num: Number(a.text)};
+          } else {
+            this.#error("Unsupported argument for inline call", a);
+          }
+        });
+
+        const scope = this.currentScope.scope;
+        this.currentScope.withNewVariableScope(() => {
+          args.forEach((arg, i) => {
+            if ('id' in arg || "num" in arg) {
+              this.currentScope.scope.new(fParams[i]).reg = new LiteralValue(arg);
+            }
+          });
+
+          f?.body?.statements.forEach((n: ts.Statement) => {
+            this.compileStatement(n);
+          });
+        }, {
+          translator: n => {
+            const i = fParams.indexOf(n);
+            if (i === -1) {
+              return undefined;
+            }
+
+            return args[i]?.variable;
+          },
+          inlined: true,
+        })
+
+        if (outs[0]) {
+          return outs[0];
+        } else {
+          return this.#temp();
+        }
       }
     } else if (ts.isPropertyAccessExpression(e.expression)) {
       name = e.expression.name.text;
@@ -925,6 +1011,36 @@ class Compiler {
       .forEach((v, i) => {
         args[v] = rawArgs[i] ? this.compileExpr(rawArgs[i]) : nilReg;
       });
+
+    const literalArgs = args.map(arg => isVar(arg) && arg.reg?.type === "value" ? arg.reg.value : undefined);
+    if(literalArgs[0]?.num != null && literalArgs[1]?.num != null) {
+      const lhs = literalArgs[0]?.num;
+      const rhs = literalArgs[1]?.num;
+      let result: number | undefined;
+      switch (name) {
+        case "add":
+          result = lhs + rhs;
+          break;
+        case "sub":
+          result = lhs - rhs;
+          break;
+        case "mul":
+          result = lhs * rhs;
+          break;
+        case "div":
+          result = lhs / rhs;
+          break;
+        case "modulo":
+          result = lhs % rhs;
+          break;
+      }
+
+      if(result != null) {
+        dest.reg = new LiteralValue({num: result});
+        return dest;
+      }
+    }
+
     if (info.thisArg != null) {
       if (
         info.autoSelf &&
