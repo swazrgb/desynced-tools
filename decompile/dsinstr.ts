@@ -58,7 +58,7 @@ export const instructions:{[key:string]:InstrInfo} = {
   },
   "compare_item": {
     "js": "compareItem",
-    "type": "operator",
+    "type": "function",
     "inArgs": [
       1,
       2
@@ -73,7 +73,7 @@ export const instructions:{[key:string]:InstrInfo} = {
   },
   "compare_entity": {
     "js": "compareEntity",
-    "type": "operator",
+    "type": "function",
     "inArgs": [
       1,
       2
@@ -258,8 +258,8 @@ export const instructions:{[key:string]:InstrInfo} = {
     ]
   },
   "check_number": {
-    "js": "checkNumber",
-    "type": "operator",
+    "js": "compareNumber",
+    "type": "function",
     "inArgs": [
       2,
       3

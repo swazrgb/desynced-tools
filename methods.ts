@@ -188,7 +188,7 @@ export const methods: { [key: string]: MethodInfo } = {
       0
     ]
   },
-  "checkNumber": {
+  "compareNumber": {
     "id": "check_number",
     "exec": {
       "=": "next",

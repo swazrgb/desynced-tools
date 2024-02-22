@@ -47,30 +47,50 @@ function isInlinePredicate(n: ts.JSDocTag): n is ts.JSDocTag {
   return n.getText().includes("@inline");
 }
 
-function compileFile(f: ts.SourceFile): string {
+function findParent<N extends ts.Node>(n: ts.Node, predicate: (n: ts.Node) => n is N): N | undefined {
+  let parent = n.parent;
+  while(parent != null && !predicate(parent)) {
+    parent = parent.parent;
+  }
+  return parent as N;
+}
+
+function compileFile(sourceFiles: ts.SourceFile[]): string {
   const c = new Compiler();
-  f.statements.forEach((n) => {
-    if (ts.isFunctionDeclaration(n)) {
-      let subName = (n.name as ts.Identifier).text;
-      const isInlined = ts.getAllJSDocTags(n, isInlinePredicate).length > 0;
+  sourceFiles.forEach(f => {
+    f.statements.forEach((n) => {
+      if (ts.isFunctionDeclaration(n)) {
+        let subName = (n.name as ts.Identifier).text;
+        const isInlined = ts.getAllJSDocTags(n, isInlinePredicate).length > 0;
 
-      const set = isInlined ? c.inlined : c.subs;
+        const set = isInlined ? c.inlined : c.subs;
 
-      if (set.has(subName)) {
-        throw new Error(`${isInlined ? "sub" : "function"} ${subName} declared multiple times`);
+        if (set.has(subName)) {
+          throw new Error(`${isInlined ? "function" : "sub"} ${subName} declared multiple times`);
+        }
+        set.set(subName, n);
+      } else if (ts.isImportDeclaration(n)) {
+        // Import statements are ignored. Currently all functions in all files share the same global namespace.
+      } else {
+        throw new Error(`unsupported node ${n.kind} ${ts.SyntaxKind[n.kind]}`);
       }
-      set.set(subName, n);
-    } else {
-      throw new Error(`unsupported node ${n.kind} ${ts.SyntaxKind[n.kind]}`);
-    }
+    });
   });
+
+  let mainSub;
   for (const sub of c.subs.values()) {
-    if (isMainFunction(sub)) {
+    if (isExported(sub) && findParent(sub, ts.isSourceFile) === sourceFiles[0]) {
+      mainSub = sub;
       c.compileBehavior(sub, true);
     }
   }
+
+  if (mainSub == null) {
+    throw new Error("at least one function must be exported");
+  }
+
   for (const sub of c.subs.values()) {
-    if (!isMainFunction(sub)) {
+    if (sub !== mainSub) {
       c.compileBehavior(sub, false);
     }
   }
@@ -220,7 +240,7 @@ class FunctionScope {
   }
 }
 
-function isMainFunction(f: ts.FunctionDeclaration): boolean {
+function isExported(f: ts.FunctionDeclaration): boolean {
   return (
     f.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword) || false
   );
@@ -1295,7 +1315,7 @@ class Compiler {
           assertNoDest();
           variable = this.compileResolvedCall(
             expression,
-            "checkNumber",
+            "compareNumber",
             undefined,
             [getNumeric(expression.left), getNumeric(expression.right)]
           );
@@ -1308,7 +1328,7 @@ class Compiler {
           assertNoDest();
           variable = this.compileResolvedCall(
             expression,
-            "checkNumber",
+            "compareNumber",
             undefined,
             [getNumeric(expression.left), getNumeric(expression.right)]
           );
@@ -1395,7 +1415,7 @@ class Compiler {
       assertNoDest();
       variable = this.compileResolvedCall(
         expression,
-        "checkNumber",
+        "compareNumber",
         undefined,
         [getNumeric(expression.left), getNumeric(expression.right)]
       );
@@ -1680,16 +1700,26 @@ export function compileProgram(program: ts.Program): string {
       );
     }
   });
+  
+  const rootFileNames = program.getRootFileNames();
+  const files: ts.SourceFile[] = [];
   for (const f of program.getSourceFiles()) {
     if (!f.fileName.endsWith(".d.ts")) {
-      f.fileName.substring(0, f.fileName.length - 3);
-      try {
-        return compileFile(f);
-      } catch (ex) {
-        console.error(ex);
+      // f.fileName.substring(0, f.fileName.length - 3);
+      if (rootFileNames.includes(f.fileName)) {
+        files.unshift(f);
+      } else {
+        files.push(f);
       }
     }
   }
+
+  try {
+    return compileFile(files);
+  } catch (ex) {
+    console.error(ex);
+  }
+
   throw new Error("No source file found");
 }
 

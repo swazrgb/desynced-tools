@@ -154,6 +154,14 @@ declare function jump(label: Value): void;
  */
 declare function wait(time: Value | number): void;
 /**
+ * Compares Item or Unit type
+ */
+declare function compareItem(value_1: Value, value_2: Value): boolean;
+/**
+ * Compares Entities
+ */
+declare function compareEntity(entity_1: Value, entity_2: Value): boolean;
+/**
  * Gets the type from an item or entity
  */
 declare function getType(item_entity: Value): Value;
@@ -196,6 +204,12 @@ declare function setResearch(tech: Value): void;
  * @param tech Tech to remove from research queue
  */
 declare function clearResearch(tech: Value): void;
+/**
+ * Divert program depending on number of Value and Compare
+ * @param value The value to check with
+ * @param compare The number to check against
+ */
+declare function compareNumber(value: Value | number, compare: Value | number): "=" | ">" | "<";
 /**
  * Writes a value into a component register
  * @param component_index Component and register number to set
