@@ -9,6 +9,7 @@ export interface MethodInfo {
   special?: 'txt'|'bp';
   c?: number;
   sub?: string;
+  firstArgControlFlow?: boolean;
 }
 export const methods: { [key: string]: MethodInfo } = {
   "nop": {
@@ -132,7 +133,8 @@ export const methods: { [key: string]: MethodInfo } = {
       2,
       3
     ],
-    "out": 4
+    "out": 4,
+    "firstArgControlFlow": true
   },
   "nearerThan": {
     "id": "select_nearest",

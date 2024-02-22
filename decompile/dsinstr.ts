@@ -15,6 +15,7 @@ interface InstrInfo {
   outArgs?: number[];
   execArgs?: number[];
   optional?: number;
+  firstArgControlFlow?: boolean;
 }
 export const instructions:{[key:string]:InstrInfo} = {
   "nop": {
@@ -164,7 +165,7 @@ export const instructions:{[key:string]:InstrInfo} = {
   },
   "select_nearest": {
     "js": "selectNearest",
-    "type": "function",
+    "type": "operator",
     "inArgs": [
       2,
       3
@@ -186,6 +187,11 @@ export const instructions:{[key:string]:InstrInfo} = {
           "B": false
         },
         "outArgs": []
+      },
+      {
+        "js": "selectNearest",
+        "type": "function",
+        "firstArgControlFlow": true
       }
     ],
     "conditions": {
