@@ -243,6 +243,7 @@ export function ObjectToDesyncedString(obj, type)
 				else                       { Push(MP_Uint64); Grow(8).setUint64(pos, v, true); }
 				break;
 			case 'string':
+				if (is_table_key && !/\D/.test(v)) return Serialize(v|0, true); // numerical keys need to be int
 				const strsz = v.length;
 				if      (strsz <    32) { Push(MP_FixStr | strsz); }
 				else if (strsz <   256) { Push(MP_Str8); Grow(1).setUint8(pos, strsz); }
