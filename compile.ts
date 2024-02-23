@@ -1570,47 +1570,48 @@ class Compiler {
 
   compileVarDecl(s: ts.VariableDeclarationList) {
     s.declarations.forEach((decl: ts.VariableDeclaration) => {
-      if (decl.initializer) {
-        const isConst = (ts.getCombinedNodeFlags(decl) & ts.NodeFlags.BlockScoped) === ts.NodeFlags.Const;
-        if (ts.isIdentifier(decl.name)) {
-          const variable = this.newVariable(decl.name, isConst);
+      const isConst = (ts.getCombinedNodeFlags(decl) & ts.NodeFlags.BlockScoped) === ts.NodeFlags.Const;
+      if (ts.isIdentifier(decl.name)) {
+        const variable = this.newVariable(decl.name, isConst);
+        if(decl.initializer) {
           this.compileExpr(decl.initializer, variable);
-        } else if (ts.isArrayBindingPattern(decl.name)) {
-          if (ts.isCallExpression(decl.initializer) || ts.isPropertyAccessExpression(decl.initializer)) {
-            const outs = decl.name.elements.map((el) => {
-              if (ts.isOmittedExpression(el)) {
-                return undefined;
-              } else if (ts.isIdentifier(el.name)) {
-                return this.newVariable(el.name);
-              } else {
-                this.#error(
-                  `unsupported array element ${el.kind} ${
-                    ts.SyntaxKind[el.kind]
-                  }`,
-                  decl
-                );
-              }
-            });
-            if(ts.isCallExpression(decl.initializer)) {
-              this.compileCall(decl.initializer, outs);
-            } else {
-              this.compileResolvedCall(
-                decl,
-                decl.initializer.name.text,
-                decl.initializer.expression,
-                [],
-                outs
-              );
-            }
+        }
+      } else if (ts.isArrayBindingPattern(decl.name)) {
+        const outs = decl.name.elements.map((el) => {
+          if (ts.isOmittedExpression(el)) {
+            return undefined;
+          } else if (ts.isIdentifier(el.name)) {
+            return this.newVariable(el.name);
           } else {
             this.#error(
-              "only call expression are valid for array initializer",
+              `unsupported array element ${el.kind} ${
+                ts.SyntaxKind[el.kind]
+              }`,
               decl
             );
           }
-        } else {
-          this.#error("Unable to bind object", decl);
+        });
+        
+        if (decl.initializer && (ts.isCallExpression(decl.initializer) || ts.isPropertyAccessExpression(decl.initializer))) {
+          if(ts.isCallExpression(decl.initializer)) {
+            this.compileCall(decl.initializer, outs);
+          } else {
+            this.compileResolvedCall(
+              decl,
+              decl.initializer.name.text,
+              decl.initializer.expression,
+              [],
+              outs
+            );
+          }
+        } else if(decl.initializer) {
+          this.#error(
+            "only call expression are valid for array initializer",
+            decl
+          );
         }
+      } else {
+        this.#error("Unable to bind object", decl);
       }
     });
   }
