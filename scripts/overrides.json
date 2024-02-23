@@ -368,5 +368,11 @@
   },
   "set_comp_reg": {
     "optional": 2
+  },
+  "is_equipped": {
+    "conditions": {
+      "next": false,
+      "Component Equipped": true
+    }
   }
 }
