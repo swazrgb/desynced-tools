@@ -5,6 +5,7 @@ import {MethodInfo, methods, ops} from "./methods";
 import {Code} from "./ir/code";
 import {Arg, Instruction, Label, LiteralValue, RegRef, Stop, StringLiteral, VariableRef,} from "./ir/instruction";
 import {generateAsm} from "./decompile/disasm";
+import { stat } from "fs";
 
 // Some arbitrary things to use for dynamic jump labels
 const dynamicLabels = [
@@ -137,9 +138,9 @@ class VariableScope {
     return this.parent?.has(translatedName) ?? false;
   }
 
-  new(name: string): Variable {
+  new(name: string, isConst = false): Variable {
     if (!this.namedVariables.has(name)) {
-      this.namedVariables.set(name, new Variable());
+      this.namedVariables.set(name, new Variable(undefined, isConst));
     }
     return this.get(name);
   }
@@ -356,9 +357,9 @@ class Compiler {
     } else if (ts.isVariableStatement(n)) {
       this.compileVarDecl(n.declarationList);
     } else if (ts.isIfStatement(n)) {
-      this.currentScope.withNewVariableScope(() => {
+      // this.currentScope.withNewVariableScope(() => {
         this.compileIf(n);
-      });
+      // });
     } else if (ts.isReturnStatement(n)) {
       if (this.currentScope.scope.inlined) {
         this.#error("Return statement not supported in inlined functions. Use parameters instead", n);
@@ -1302,20 +1303,30 @@ class Compiler {
     const then = this.#label();
     this.#rewriteLabel(ref, then);
     this.#emitLabel(then);
-    this.compileStatement(s.thenStatement);
+    this.currentScope.withNewVariableScope(() => {
+      this.compileStatement(s.thenStatement);
+    });
     this.#jump(end);
     if (s.elseStatement) {
-      if (ts.isIfStatement(s.elseStatement)) {
-        this.compileIf(s.elseStatement, variable, end);
-      } else {
-        const elseLabel = this.#label();
+      const elseLabel = this.#label();
         variable.exec?.forEach((v) => {
           this.#rewriteLabel(v, elseLabel, true);
         });
         this.#emitLabel(elseLabel);
-        this.compileStatement(s.elseStatement);
-        this.#jump(end);
+        const { elseStatement } = s;
+      if (ts.isIfStatement(elseStatement)) {
+        // this.compileIf(s.elseStatement, variable, end);
+        // const elseStatement = s.elseStatement;
+        // this.currentScope.withNewVariableScope(() => {
+          this.compileIf(elseStatement, undefined, parentEnd);
+        // });
+      } else {
+        this.currentScope.withNewVariableScope(() => {
+          this.compileStatement(elseStatement);
+        });
       }
+      this.#jump(end);
+
     }
     if (!parentEnd) {
       variable.exec?.forEach((v) => {
@@ -1560,8 +1571,10 @@ class Compiler {
   compileVarDecl(s: ts.VariableDeclarationList) {
     s.declarations.forEach((decl: ts.VariableDeclaration) => {
       if (decl.initializer) {
+        const isConst = (ts.getCombinedNodeFlags(decl) & ts.NodeFlags.BlockScoped) === ts.NodeFlags.Const;
         if (ts.isIdentifier(decl.name)) {
-          this.compileExpr(decl.initializer, this.newVariable(decl.name));
+          const variable = this.newVariable(decl.name, isConst);
+          this.compileExpr(decl.initializer, variable);
         } else if (ts.isArrayBindingPattern(decl.name)) {
           if (ts.isCallExpression(decl.initializer) || ts.isPropertyAccessExpression(decl.initializer)) {
             const outs = decl.name.elements.map((el) => {
@@ -1579,9 +1592,9 @@ class Compiler {
               }
             });
             if(ts.isCallExpression(decl.initializer)) {
-              return this.compileCall(decl.initializer, outs);
+              this.compileCall(decl.initializer, outs);
             } else {
-              return this.compileResolvedCall(
+              this.compileResolvedCall(
                 decl,
                 decl.initializer.name.text,
                 decl.initializer.expression,
@@ -1610,8 +1623,8 @@ class Compiler {
     return this.currentScope.scope.get(name, reg);
   }
 
-  newVariable(id: ts.Identifier): Variable {
-    return this.currentScope.scope.new(id.text);
+  newVariable(id: ts.Identifier, isConst = false): Variable {
+    return this.currentScope.scope.new(id.text, isConst);
   }
 
   ref(
@@ -1631,10 +1644,12 @@ class Compiler {
     const v = isVar(varname) ? varname : this.variable(varname);
     v.operations |= operation;
     
-    if(value instanceof LiteralValue) {
-      v.literal = value;
-    } else if(value !== undefined) {
-      v.literal = undefined;
+    if(v.const) {
+     if(value instanceof LiteralValue) {
+        v.literal = value;
+      } else if(value !== undefined) {
+        v.literal = undefined;
+      }
     }
 
     return v;
@@ -1743,10 +1758,11 @@ class Variable {
   reg?: RegRef | LiteralValue;
   literal?: LiteralValue;
   exec?: Map<string | boolean, ArgRef>;
+  const: boolean;
 
-  constructor(reg?: RegRef | LiteralValue) {
+  constructor(reg?: RegRef | LiteralValue, isConst = false) {
     this.reg = reg;
-    this.literal = reg?.type === "value" ? reg : undefined;
+    this.const = isConst;
   }
 }
 function isVar(t: unknown): t is Variable {
