@@ -112,7 +112,7 @@ class VariableScope {
   translator?: ScopeTranslator;
   inlined: boolean = false;
 
-  newScope(inlined: boolean, translator: ScopeTranslator | undefined): VariableScope {
+  newScope(inlined: boolean = false, translator?: ScopeTranslator): VariableScope {
     let result = new VariableScope();
     result.parent = this;
     result.translator = translator;
@@ -212,8 +212,15 @@ class FunctionScope {
     translator?: ScopeTranslator,
     inlined?: boolean
   } = {}) {
+    this.withVariableScope(
+      this.scope.newScope(inlined, translator),
+      f
+    );
+  }
+
+  withVariableScope(newScope: VariableScope, f: () => undefined) {
     let scope = this.scope;
-    this.scope = this.scope.newScope(inlined, translator);
+    this.scope = newScope;
     try {
       f();
     } finally {
@@ -254,6 +261,7 @@ class Compiler {
   functionScopes: FunctionScope[] = [];
   currentScope: FunctionScope = new FunctionScope();
   haveBehavior = false;
+  userLabels: Array<{variable: Variable, body: ts.Block, scope: VariableScope}> = [];
 
   constructor() {}
 
@@ -269,6 +277,7 @@ class Compiler {
     }
     this.haveBehavior = isMain;
     this.setupNewScope();
+    this.userLabels = [];
     // TODO: use jsdoc if present
     this.#emitLabel(subName);
     if (!isMain) {
@@ -305,7 +314,19 @@ class Compiler {
     }
     f.body?.statements.forEach(this.compileStatement.bind(this));
     this.#rawEmit(".ret");
+
+    for(const info of this.userLabels) {
+      this.currentScope.withVariableScope(info.scope, () => {
+        this.#emit(methods.label, this.ref(info.variable, VariableOperations.Read));
+        info.body.statements.forEach(this.compileStatement.bind(this));
+      });
+
+      this.#rawEmit(".ret");
+    }
+
     this.#regAlloc();
+
+    
   }
 
   #regAlloc() {
@@ -624,7 +645,7 @@ class Compiler {
         this.#emit(
           methods.setReg,
           nilReg,
-          this.ref(dest, VariableOperations.Write)
+          this.ref(dest, VariableOperations.Write, nilReg)
         );
       } else {
         return new Variable(nilReg);
@@ -635,21 +656,25 @@ class Compiler {
         const v = this.variable(e);
         this.#emit(methods.getSelf, v);
       }
+
+      let value = this.variable(e);
+      value = value.literal ? new Variable(value.literal) : value;
+
       if (dest) {
         this.#emit(
           methods.setReg,
-          this.variable(e),
-          this.ref(dest, VariableOperations.Write)
+          value,
+          this.ref(dest, VariableOperations.Write, value.reg)
         );
       }
-      return this.variable(e);
+      return value;
     } else if (ts.isNumericLiteral(e)) {
       const value = new LiteralValue({ num: Number(e.text) });
       if (dest) {
         this.#emit(
           methods.setReg,
           value,
-          this.ref(dest, VariableOperations.Write)
+          this.ref(dest, VariableOperations.Write, value)
         );
       } else {
         return new Variable(value);
@@ -661,7 +686,7 @@ class Compiler {
         this.#emit(
           methods.setReg,
           value,
-          this.ref(dest, VariableOperations.Write)
+          this.ref(dest, VariableOperations.Write, value)
         );
       } else {
         return new Variable(value);
@@ -688,7 +713,7 @@ class Compiler {
         this.#emit(
           methods.setReg,
           value,
-          this.ref(dest, VariableOperations.Write)
+          this.ref(dest, VariableOperations.Write, value)
         );
       } else {
         return new Variable(value);
@@ -722,7 +747,7 @@ class Compiler {
         this.#emit(
           methods.setReg,
           value,
-          this.ref(dest, VariableOperations.Write)
+          this.ref(dest, VariableOperations.Write, value)
         );
       } else {
         return new Variable(value);
@@ -859,7 +884,7 @@ class Compiler {
     }
   };
 
-  builtins: Record<string, (e: ts.CallExpression) => LiteralValue> = {
+  builtins: Record<string, (e: ts.CallExpression) => LiteralValue | undefined | void> = {
     value: (e) => {
       if (e.arguments.length !== 2) {
         this.#error(`Unsupported argument length: ${e.arguments.length}`, e);
@@ -895,6 +920,13 @@ class Compiler {
           y: b
         }
       });
+    },
+    ret: (e) => {
+      if (e.arguments.length !== 0) {
+        this.#error(`Unsupported argument length: ${e.arguments.length}`, e);
+      }
+
+      this.#rawEmit(".ret");
     }
   }
 
@@ -911,24 +943,39 @@ class Compiler {
         const value = this.builtins[name](e);
 
         if (outs[0]) {
-          this.#emit(
-            methods.setReg,
-            value,
-            this.ref(outs[0], VariableOperations.Write)
-          );
+          if (value) {
+            this.#emit(
+              methods.setReg,
+              value,
+              this.ref(outs[0], VariableOperations.Write, value)
+            );
+          }
 
           return outs[0];
         } else {
-          return new Variable(value);
+          return new Variable(value ?? nilReg);
         }
+      } else if (name === "label" && e.arguments.length === 2) {
+        if(!ts.isFunctionLike(e.arguments[1])) {
+          this.#error("label argument 2 must be function", e.arguments[1]);
+        }
+
+        if(!ts.isBlock(e.arguments[1].body)) {
+          this.#error("label argument 2 must be function block", e.arguments[1].body);
+        }
+
+        if(e.arguments[1].parameters.length > 0) {
+          this.#error("label callback may not have any parameters", e.arguments[1]);
+        }
+
+        const variable = this.compileExpr(e.arguments[0]);
+        this.userLabels.push({
+          variable,
+          body: e.arguments[1].body,
+          scope: this.currentScope.scope.newScope()
+        });
+        return new Variable(nilReg);
       } else if (this.inlined.has(name)) {
-        // TODO inline!
-        // this.#emit(
-        //     methods.setReg,
-        //     new LiteralValue({num: 1}),
-        //     this.ref(outs[0], VariableOperations.Write)
-        // );
-        // this.compileInstructions()
         const f = this.inlined.get(name);
 
         // function argument names
@@ -1130,16 +1177,18 @@ class Compiler {
             s.expression.expression,
             []
           );
-        } else {
-          this.#compileDynamicJump(s, theEnd);
         }
-        if (variable) {
+
+        if(!variable || !variable.exec) {
+          this.#compileDynamicJump(s, theEnd);
+        } else {
           if (!variable.exec) {
             this.#error(
               "switch statement must use a flow control instruction",
               s
             );
           }
+
           let hasDefault = false;
           for (const clause of s.caseBlock.clauses) {
             const clauseLabel = this.#label();
@@ -1188,11 +1237,12 @@ class Compiler {
     if (!labelType) {
       this.#error("Too many switch statements", s);
     }
+    const value = new LiteralValue({ id: labelType });
     this.#emit(
       methods.setNumber,
-      new LiteralValue({ id: labelType }),
+      value,
       this.ref(this.compileExpr(s.expression), VariableOperations.Read),
-      this.ref(cond, VariableOperations.Write)
+      this.ref(cond, VariableOperations.Write, value)
     );
 
     const defaultClause = s.caseBlock.clauses.find((clause) =>
@@ -1553,10 +1603,27 @@ class Compiler {
 
   ref(
     varname: string | ts.Identifier | Variable,
-    operation: VariableOperations
+    operation: VariableOperations.None | VariableOperations.Read
+  ): Variable;
+  ref(
+    varname: string | ts.Identifier | Variable,
+    operation: VariableOperations.Write | VariableOperations.All,
+    value: RegRef | LiteralValue | undefined | null
+  ): Variable;
+  ref(
+    varname: string | ts.Identifier | Variable,
+    operation: VariableOperations,
+    value?: RegRef | LiteralValue
   ): Variable {
     const v = isVar(varname) ? varname : this.variable(varname);
     v.operations |= operation;
+    
+    if(value instanceof LiteralValue) {
+      v.literal = value;
+    } else if(value !== undefined) {
+      v.literal = undefined;
+    }
+
     return v;
   }
 
@@ -1581,9 +1648,9 @@ class Compiler {
         return v;
       }
       if (inst.op == "call") {
-        v = this.ref(v, VariableOperations.All);
+        v = this.ref(v, VariableOperations.All, null);
       } else if (outArgs.includes(i)) {
-        v = this.ref(v, VariableOperations.Write);
+        v = this.ref(v, VariableOperations.Write, undefined);
       } else {
         v = this.ref(v, VariableOperations.Read);
       }
@@ -1626,6 +1693,11 @@ class Compiler {
     const finalProg = new Code();
     finalProg.code = this.functionScopes.flatMap((scope) => scope.program.code);
     finalProg.apply(resolveVariables);
+    finalProg.apply((inst:Instruction) => {
+      if(inst.op === "set_reg" && inst.args[1] === nilReg) {
+        return false;
+      }
+    });
     return finalProg;
   }
   asm() {
@@ -1649,6 +1721,7 @@ class Variable {
   type = VariableSymbol;
   operations = VariableOperations.None;
   reg?: RegRef | LiteralValue;
+  literal?: LiteralValue;
   exec?: Map<string | boolean, ArgRef>;
 
   constructor(reg?: RegRef | LiteralValue) {

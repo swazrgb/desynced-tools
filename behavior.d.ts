@@ -965,3 +965,4 @@ declare function value(id: Comp, num: number): CompNumPair;
 declare function value(id: Item, num: number): ItemNumPair;
 declare function value(id: Resource, num: number): ResourceNumPair;
 declare function value(id: Frame, num: number): FrameNumPair;
+declare function label(value: Value, cb: () => void);

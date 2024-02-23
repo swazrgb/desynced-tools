@@ -2,7 +2,7 @@ import { Instruction } from "./instruction";
 
 export interface Pass {
     reverse?: boolean;
-    (instr: Instruction, ip: number, program:Code): void;
+    (instr: Instruction, ip: number, program:Code): boolean | void;
 }
 
 export class Code {
@@ -19,7 +19,10 @@ export class Code {
         }
         for (let i = 0; i < this.code.length; i++) {
             const instr = this.code[i];
-            pass(instr, i, this);
+            if(pass(instr, i, this) === false) {
+                this.code.splice(i, 1);
+                i--;
+            }
         }
     }
 
