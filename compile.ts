@@ -1,7 +1,7 @@
 // Copyright 2023 Ryan Brown
 
 import * as ts from "typescript";
-import {MethodInfo, methods} from "./methods";
+import {MethodInfo, methods, ops} from "./methods";
 import {Code} from "./ir/code";
 import {Arg, Instruction, Label, LiteralValue, RegRef, Stop, StringLiteral, VariableRef,} from "./ir/instruction";
 import {generateAsm} from "./decompile/disasm";
@@ -997,7 +997,9 @@ class Compiler {
         this.currentScope.withNewVariableScope(() => {
           args.forEach((arg, i) => {
             if ('id' in arg || "num" in arg) {
-              this.currentScope.scope.new(fParams[i]).reg = new LiteralValue(arg);
+              const v = this.currentScope.scope.new(fParams[i]);
+              v.reg = new LiteralValue(arg);
+              v.literal = v.reg;
             }
           });
 
@@ -1076,10 +1078,17 @@ class Compiler {
     info.in
       ?.filter(v => info.thisArg !== v)
       .forEach((v, i) => {
-        args[v] = rawArgs[i] ? this.compileExpr(rawArgs[i]) : nilReg;
+        const arg = rawArgs[i] ? this.compileExpr(rawArgs[i]) : nilReg;
+        if(isVar(arg) && arg.literal != null) {
+          args[v] = arg.literal;
+        } else if(isVar(arg) && arg.reg?.type === "value") {
+          arg[v] = arg.reg.value;
+        } else {
+          arg[v] = arg;
+        }
       });
 
-    const literalArgs = args.map(arg => isVar(arg) && arg.reg?.type === "value" ? arg.reg.value : undefined);
+    const literalArgs = args.map(arg => arg instanceof LiteralValue ? arg.value : undefined);
     if(literalArgs[0]?.num != null && literalArgs[1]?.num != null) {
       const lhs = literalArgs[0]?.num;
       const rhs = literalArgs[1]?.num;
@@ -1103,8 +1112,8 @@ class Compiler {
       }
 
       if(result != null) {
-        dest.reg = new LiteralValue({num: result});
-        return dest;
+        dest.literal = new LiteralValue({num: result});
+        // return dest;
       }
     }
 
@@ -1694,7 +1703,12 @@ class Compiler {
     finalProg.code = this.functionScopes.flatMap((scope) => scope.program.code);
     finalProg.apply(resolveVariables);
     finalProg.apply((inst:Instruction) => {
-      if(inst.op === "set_reg" && inst.args[1] === nilReg) {
+      const op = ops[inst.op];
+      if (!op) return;
+      const out = typeof op.out === "number" ? [ op.out ] : op.out;
+      const allOutsNil = out?.every(o => inst.args[o] === nilReg);
+      if(["set_reg", "add", "sub", "mul", "div", "modulo"].includes(inst.op) && allOutsNil) {
+        // A set_reg that writes to the nil register is a no-op, happens when folding constants
         return false;
       }
     });
@@ -1726,6 +1740,7 @@ class Variable {
 
   constructor(reg?: RegRef | LiteralValue) {
     this.reg = reg;
+    this.literal = reg?.type === "value" ? reg : undefined;
   }
 }
 function isVar(t: unknown): t is Variable {

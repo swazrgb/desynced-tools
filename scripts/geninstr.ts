@@ -405,7 +405,14 @@ export const methods: { [key: string]: MethodInfo } = ${JSON.stringify(
     compileInfos,
     undefined,
     2
-  )}
+  )};
+
+export const ops: {
+  [key: string]: MethodInfo;
+} = {};
+for (const op of Object.values(methods)) {
+  ops[op.id] = op;
+}
 `
 );
 
