@@ -203,7 +203,7 @@ class FunctionScope {
     let i = this.paramCounter + 1;
     this.paramCounter++;
     const reg = new RegRef(i);
-    this.emit(".pname", reg);
+    // this.emit(".pname", reg);
     this.emit(".out", reg);
     this.outputs.push(new Variable(reg));
   }
@@ -657,17 +657,17 @@ class Compiler {
         this.#emit(methods.getSelf, v);
       }
 
-      let value = this.variable(e);
-      value = value.literal ? new Variable(value.literal) : value;
+      const variable = this.variable(e);
 
       if (dest) {
+        const value = variable.literal ? new Variable(variable.literal) : variable;
         this.#emit(
           methods.setReg,
           value,
           this.ref(dest, VariableOperations.Write, value.reg)
         );
       }
-      return value;
+      return variable;
     } else if (ts.isNumericLiteral(e)) {
       const value = new LiteralValue({ num: Number(e.text) });
       if (dest) {
@@ -760,8 +760,10 @@ class Compiler {
     } else if (ts.isPrefixUnaryExpression(e)) {
       if(e.operator == ts.SyntaxKind.PlusToken) {
         return this.compileExpr(e.operand, dest);
+      } else if (e.operator == ts.SyntaxKind.MinusToken) {
+        return this.compileResolvedCall(e, "sub", undefined, [ts.factory.createNumericLiteral(0), e.operand], [dest]);
       } else {
-        this.#error(`unsupported prefix expression ${e.kind} ${ts.SyntaxKind[e.kind]}`, e);
+        this.#error(`unsupported prefix expression ${e.operator} ${ts.SyntaxKind[e.operator]}`, e);
       }
     }
     this.#error(`unsupported expression ${e.kind} ${ts.SyntaxKind[e.kind]}`, e);
@@ -1079,12 +1081,14 @@ class Compiler {
       ?.filter(v => info.thisArg !== v)
       .forEach((v, i) => {
         const arg = rawArgs[i] ? this.compileExpr(rawArgs[i]) : nilReg;
-        if(isVar(arg) && arg.literal != null) {
+        if(info.id === "call") {
+          args[v] = arg;
+        } else if(isVar(arg) && arg.literal != null) {
           args[v] = arg.literal;
         } else if(isVar(arg) && arg.reg?.type === "value") {
-          arg[v] = arg.reg.value;
+          args[v] = arg.reg;
         } else {
-          arg[v] = arg;
+          args[v] = arg;
         }
       });
 
@@ -1705,11 +1709,13 @@ class Compiler {
     finalProg.apply((inst:Instruction) => {
       const op = ops[inst.op];
       if (!op) return;
-      const out = typeof op.out === "number" ? [ op.out ] : op.out;
-      const allOutsNil = out?.every(o => inst.args[o] === nilReg);
+      const ins = (typeof op.in === "number" ? [ op.in ] : op.in)?.map(o => inst.args[o]) ?? [];
+      const outs = (typeof op.out === "number" ? [ op.out ] : op.out)?.map(o => inst.args[o]) ?? [];
+      const allOutsNil = outs.every(o => o === nilReg);
       if(["set_reg", "add", "sub", "mul", "div", "modulo"].includes(inst.op) && allOutsNil) {
         // A set_reg that writes to the nil register is a no-op, happens when folding constants
-        return false;
+        inst.op = 'nop';
+        inst.args = [];
       }
     });
     return finalProg;

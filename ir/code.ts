@@ -19,10 +19,7 @@ export class Code {
         }
         for (let i = 0; i < this.code.length; i++) {
             const instr = this.code[i];
-            if(pass(instr, i, this) === false) {
-                this.code.splice(i, 1);
-                i--;
-            }
+            pass(instr, i, this);
         }
     }
 

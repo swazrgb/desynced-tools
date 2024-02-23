@@ -138,7 +138,7 @@ export class Instruction {
   nx?: number;
   ny?: number;
 
-  constructor(readonly op: string, public args: (Arg | undefined)[]) {}
+  constructor(public op: string, public args: (Arg | undefined)[]) {}
 
   forArgs(
     indexes: number[] | undefined,
