@@ -1,0 +1,342 @@
+{
+  "frames": {
+    "f_empty": {},
+    "f_mothership": {
+      "name": "Mothership"
+    },
+    "f_landingpod": {
+      "name": "Command Center"
+    },
+    "f_beacon": {
+      "name": "Beacon",
+      "size": "Other"
+    },
+    "f_beacon_l": {
+      "name": "Large Beacon",
+      "size": "Other"
+    },
+    "f_spacedrop": {
+      "name": "Drop Ship"
+    },
+    "f_wall": {
+      "name": "Wall",
+      "size": "Other"
+    },
+    "f_wall_vir": {
+      "name": "Virus Wall"
+    },
+    "f_wall_bli": {
+      "name": "Blight Wall"
+    },
+    "f_building1x1a": {
+      "name": "Building 1x1 (1M)",
+      "size": "Medium"
+    },
+    "f_building1x1b": {
+      "name": "Building 1x1 (L)",
+      "size": "Large"
+    },
+    "f_building1x1c": {
+      "name": "Building 1x1 (2S)",
+      "size": "Small"
+    },
+    "f_building1x1d": {
+      "name": "Building 1x1 (1S)",
+      "size": "Small"
+    },
+    "f_building1x1f": {
+      "name": "Storage Block (8)",
+      "size": "Small"
+    },
+    "f_building1x1g": {
+      "name": "Storage Block (16)",
+      "size": "Small"
+    },
+    "f_building2x1a": {
+      "name": "Building 2x1 (2M)",
+      "size": "Medium"
+    },
+    "f_building2x1e": {
+      "name": "Building 2x1 (2S1M)",
+      "size": "Medium"
+    },
+    "f_building2x1f": {
+      "name": "Building 2x1 (1M1S)",
+      "size": "Medium"
+    },
+    "f_building2x1g": {
+      "name": "Building 2x1 (1M)",
+      "size": "Medium"
+    },
+    "f_building2x2b": {
+      "name": "Building 2x2 (3M)",
+      "size": "Medium"
+    },
+    "f_building2x2f": {
+      "name": "Building 2x2 (2M)",
+      "size": "Medium"
+    },
+    "f_building_simulator": {
+      "name": "Simulator",
+      "size": "Special"
+    },
+    "f_building_sim": {
+      "name": "Re-simulator",
+      "size": "Special"
+    },
+    "f_roamingbot": {
+      "name": "Curious Bot"
+    },
+    "f_bot_1s_as": {
+      "name": "Scout",
+      "size": "Unit"
+    },
+    "f_bot_1s_adw": {
+      "name": "Engineer",
+      "size": "Unit"
+    },
+    "f_bot_2m_as": {
+      "name": "Command Center",
+      "size": "Unit"
+    },
+    "f_bot_1s_a": {
+      "name": "Worker",
+      "size": "Unit"
+    },
+    "f_bot_1s_b": {
+      "name": "Dashbot",
+      "size": "Unit"
+    },
+    "f_bot_2s": {
+      "name": "Twinbot",
+      "size": "Unit"
+    },
+    "f_bot_1m_a": {
+      "name": "Cub",
+      "size": "Unit"
+    },
+    "f_dropped_item": {
+      "name": "Dropped Item"
+    },
+    "f_construction": {
+      "name": "Construction"
+    },
+    "f_foundation": {
+      "name": "Foundation",
+      "size": "Other"
+    },
+    "f_human_foundation": {
+      "name": "Human Foundation",
+      "size": "Other"
+    },
+    "f_human_foundation_basic": {
+      "name": "Basic Human Foundation",
+      "size": "Other"
+    },
+    "f_explorable": {
+      "name": "Explorable"
+    },
+    "f_human_explorable": {
+      "name": "Human Explorable"
+    },
+    "f_explorable_glitch": {
+      "name": "Explorable Glitch"
+    },
+    "f_feature": {
+      "name": "Feature"
+    },
+    "f_blocking_feature": {
+      "name": "Land Feature"
+    },
+    "f_floating_feature": {
+      "name": "Land Feature"
+    },
+    "f_damage_plant": {
+      "name": "Power Flower",
+      "size": "Alien"
+    },
+    "f_phase_plant": {
+      "name": "Phase Flower",
+      "size": "Alien"
+    },
+    "f_trilobyte1": {
+      "name": "Trilobyte",
+      "size": "Unit"
+    },
+    "f_gastarias1": {
+      "name": "Scale Worm"
+    },
+    "f_scaramar1": {
+      "name": "Malika"
+    },
+    "f_scaramar2": {
+      "name": "Mothika"
+    },
+    "f_gastarid1": {
+      "name": "Ravager"
+    },
+    "f_charcharosaurus1": {
+      "name": "Gigakaiju"
+    },
+    "f_particlespawner": {
+      "name": "Particle Spawner"
+    },
+    "f_forestleaves": {},
+    "f_dropped_resource": {
+      "name": "Scattered Resource"
+    },
+    "f_exploreable_bot_glitch": {
+      "name": "Small Bot Glitch"
+    },
+    "f_bug_hive": {
+      "name": "Bug Hive"
+    },
+    "f_bug_hive_large": {
+      "name": "Large Bug Hive"
+    },
+    "f_giant_home": {
+      "name": "Giant Beast"
+    },
+    "f_bug_home": {
+      "name": "Bug Hole"
+    },
+    "f_bug_hole": {
+      "name": "Bug Hole"
+    },
+    "f_building1x1e": {
+      "name": "Storage Block (24)",
+      "size": "Small"
+    },
+    "f_building2x1b": {
+      "name": "Building 2x1 (1M1L)",
+      "size": "Large"
+    },
+    "f_building2x1c": {
+      "name": "Building 2x1 (2M)",
+      "size": "Medium"
+    },
+    "f_building2x1d": {
+      "name": "Building 2x1 (1M)",
+      "size": "Medium"
+    },
+    "f_building2x2a": {
+      "name": "Building 2x2 (2M1L)",
+      "size": "Large"
+    },
+    "f_building2x2c": {
+      "name": "Building 2x2 (2M1L)",
+      "size": "Large"
+    },
+    "f_building2x2d": {
+      "name": "Building 2x2 (2M1L)",
+      "size": "Large"
+    },
+    "f_building2x2e": {
+      "name": "Building 2x2 (1M3S)",
+      "size": "Medium"
+    },
+    "f_building_pf": {
+      "name": "Particle Forge",
+      "size": "Special"
+    },
+    "f_transport_bot": {
+      "name": "Transport Bot",
+      "size": "Unit"
+    },
+    "f_bot_1m1s": {
+      "name": "Hound",
+      "size": "Unit"
+    },
+    "f_bot_1m_b": {
+      "name": "Hauler",
+      "size": "Unit"
+    },
+    "f_bot_1m_c": {
+      "name": "Mark V",
+      "size": "Unit"
+    },
+    "f_bot_1l_a": {
+      "name": "Rock",
+      "size": "Unit"
+    },
+    "f_flyer_bot": {
+      "name": "Flyer Bot",
+      "size": "Unit"
+    },
+    "f_drone_transfer_a": {
+      "name": "Drone",
+      "size": "Drone"
+    },
+    "f_drone_transfer_a2": {
+      "name": "Transfer Drone",
+      "size": "Drone"
+    },
+    "f_drone_miner_a": {
+      "name": "Miner Drone",
+      "size": "Drone"
+    },
+    "f_drone_adv_miner": {
+      "name": "Advanced Miner Drone",
+      "size": "Drone"
+    },
+    "f_drone_defense_a": {
+      "name": "Defense Drone",
+      "size": "Drone"
+    },
+    "f_flyer_m": {
+      "name": "Shuttle Bot",
+      "size": "Unit"
+    },
+    "f_satellite": {
+      "name": "Satellite"
+    },
+    "f_building3x2a": {
+      "name": "Building 3x2 (1L3M)",
+      "size": "Large"
+    },
+    "f_building3x2b": {
+      "name": "Building 3x2 (2M2S)",
+      "size": "Medium"
+    },
+    "f_building_fg": {
+      "name": "Fusion Generator",
+      "size": "Special"
+    },
+    "f_amac": {
+      "name": "AMAC",
+      "size": "Special"
+    },
+    "f_human_flyer": {
+      "name": "Human Flyer",
+      "size": "Unit"
+    },
+    "f_human_tank": {
+      "name": "Human Tank",
+      "size": "Unit"
+    },
+    "f_human_miner": {
+      "name": "Human Miner Mech",
+      "size": "Unit"
+    },
+    "f_alien_soldier": {
+      "name": "Alien Soldier",
+      "size": "Unit"
+    },
+    "f_alienbot": {
+      "name": "Alien Unit",
+      "size": "Unit"
+    },
+    "f_alien_worker": {
+      "name": "Alien Worker",
+      "size": "Unit"
+    },
+    "f_present1x1": {
+      "name": "Present",
+      "size": "Small"
+    },
+    "f_carrier_bot": {
+      "name": "Runner",
+      "size": "Unit"
+    }
+  }
+}

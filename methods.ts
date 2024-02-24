@@ -789,8 +789,8 @@ export const methods: { [key: string]: MethodInfo } = {
   "isEquipped": {
     "id": "is_equipped",
     "exec": {
-      "true": "next",
-      "false": 1
+      "false": "next",
+      "true": 1
     },
     "in": [
       0

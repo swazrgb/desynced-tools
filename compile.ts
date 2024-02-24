@@ -1,11 +1,12 @@
 // Copyright 2023 Ryan Brown
 
 import * as ts from "typescript";
+import {ModuleKind, ModuleResolutionKind} from "typescript";
 import {MethodInfo, methods, ops} from "./methods";
 import {Code} from "./ir/code";
 import {Arg, Instruction, Label, LiteralValue, RegRef, Stop, StringLiteral, VariableRef,} from "./ir/instruction";
 import {generateAsm} from "./decompile/disasm";
-import { stat } from "fs";
+import {getDataByIdOrName} from "./data";
 
 // Some arbitrary things to use for dynamic jump labels
 const dynamicLabels = [
@@ -682,7 +683,7 @@ class Compiler {
       }
       return dest;
     } else if (ts.isStringLiteral(e)) {
-      const value = new LiteralValue({ id: e.text });
+      const value = new LiteralValue({ id: getDataByIdOrName(e.text)?.id ?? e.text });
       if (dest) {
         this.#emit(
           methods.setReg,
@@ -901,7 +902,7 @@ class Compiler {
       }
 
       return new LiteralValue({
-        id: a,
+        id: getDataByIdOrName(a)?.id ?? a,
         num: b
       });
     },
@@ -1326,7 +1327,6 @@ class Compiler {
         });
       }
       this.#jump(end);
-
     }
     if (!parentEnd) {
       variable.exec?.forEach((v) => {
@@ -1784,9 +1784,11 @@ function resolveVariables(inst:Instruction) {
 
 const nilReg = new RegRef(0);
 
-export const CompilerOptions = {
+export const CompilerOptions: ts.CompilerOptions = {
   lib: ["lib.es2023.d.ts"],
   target: ts.ScriptTarget.ES2022,
+  moduleResolution: ModuleResolutionKind.NodeNext,
+  module: ModuleKind.NodeNext
 };
 
 export function compileProgram(program: ts.Program): string {

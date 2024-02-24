@@ -1,0 +1,312 @@
+{
+  "items": {
+    "metalore": {
+      "name": "Metal Ore",
+      "tag": "resource"
+    },
+    "crystal": {
+      "name": "Crystal Chunk",
+      "tag": "resource"
+    },
+    "laterite": {
+      "name": "Laterite ore",
+      "tag": "resource"
+    },
+    "aluminiumrod": {
+      "name": "Aluminum Rod",
+      "tag": "simple_material"
+    },
+    "aluminiumsheet": {
+      "name": "Aluminum Sheet",
+      "tag": "simple_material"
+    },
+    "silica": {
+      "name": "Silica sand",
+      "tag": "resource"
+    },
+    "fused_electrodes": {
+      "name": "Fused Electrodes",
+      "tag": "hitech_material"
+    },
+    "reinforced_plate": {
+      "name": "Reinforced Plate",
+      "tag": "advanced_material"
+    },
+    "optic_cable": {
+      "name": "Optic Cable",
+      "tag": "hitech_material"
+    },
+    "circuit_board": {
+      "name": "Circuit Board",
+      "tag": "advanced_material"
+    },
+    "infected_circuit_board": {
+      "name": "Infected Circuit Board",
+      "tag": "advanced_material"
+    },
+    "obsidian": {
+      "name": "Obsidian chunk",
+      "tag": "resource"
+    },
+    "metalbar": {
+      "name": "Metal Bar",
+      "tag": "simple_material"
+    },
+    "metalplate": {
+      "name": "Metal Plate",
+      "tag": "simple_material"
+    },
+    "foundationplate": {
+      "name": "Foundation Plate",
+      "tag": "simple_material"
+    },
+    "ldframe": {
+      "name": "Low-Density Frame",
+      "tag": "hitech_material"
+    },
+    "energized_plate": {
+      "name": "Energized Plate",
+      "tag": "advanced_material"
+    },
+    "hdframe": {
+      "name": "High-Density Frame",
+      "tag": "hitech_material"
+    },
+    "beacon_frame": {
+      "name": "Beacon Kit",
+      "tag": "advanced_material"
+    },
+    "refined_crystal": {
+      "name": "Refined Crystal",
+      "tag": "advanced_material"
+    },
+    "crystal_powder": {
+      "name": "Crystal Powder",
+      "tag": "advanced_material"
+    },
+    "obsidian_brick": {
+      "name": "Obsidian Brick",
+      "tag": "simple_material"
+    },
+    "alien_artifact": {
+      "name": "Alien Artifact",
+      "tag": "resource"
+    },
+    "alien_artifact_research": {
+      "name": "Research Artifact",
+      "tag": "resource"
+    },
+    "silicon": {
+      "name": "Silicon",
+      "tag": "simple_material"
+    },
+    "wire": {
+      "name": "Wire",
+      "tag": "simple_material"
+    },
+    "cable": {
+      "name": "Cable",
+      "tag": "advanced_material"
+    },
+    "icchip": {
+      "name": "IC Chip",
+      "tag": "hitech_material"
+    },
+    "micropro": {
+      "name": "Microprocessor",
+      "tag": "hitech_material"
+    },
+    "cpu": {
+      "name": "CPU",
+      "tag": "hitech_material"
+    },
+    "steelblock": {
+      "name": "Steel Block",
+      "tag": "simple_material"
+    },
+    "concreteslab": {
+      "name": "Concretes Lab",
+      "tag": "simple_material"
+    },
+    "ceramictiles": {
+      "name": "Ceramic Tiles",
+      "tag": "simple_material"
+    },
+    "polymer": {
+      "name": "Polymer",
+      "tag": "simple_material"
+    },
+    "robot_datacube": {
+      "name": "Robotics Datacube",
+      "tag": "research"
+    },
+    "alien_datacube": {
+      "name": "Alien Datacube",
+      "tag": "research"
+    },
+    "human_datacube": {
+      "name": "Human Datacube",
+      "tag": "research"
+    },
+    "blight_datacube": {
+      "name": "Blight Datacube",
+      "tag": "research"
+    },
+    "virus_research_data": {
+      "name": "Virus Datacube",
+      "tag": "research"
+    },
+    "empty_databank": {
+      "name": "Empty Data Bank",
+      "tag": "research"
+    },
+    "datacube_matrix": {
+      "name": "Datacube Matrix",
+      "tag": "research"
+    },
+    "robot_research": {
+      "name": "Robotics Research",
+      "tag": "research"
+    },
+    "human_research": {
+      "name": "Human Research",
+      "tag": "research"
+    },
+    "alien_research": {
+      "name": "Alien Research",
+      "tag": "research"
+    },
+    "blight_research": {
+      "name": "Blight Research",
+      "tag": "research"
+    },
+    "virus_research": {
+      "name": "Virus Research",
+      "tag": "research"
+    },
+    "adv_data": {
+      "name": "Compressed Simulation Data",
+      "tag": "research"
+    },
+    "human_databank": {
+      "name": "Human Data Bank",
+      "tag": "research"
+    },
+    "alien_databank": {
+      "name": "Alien Data Bank",
+      "tag": "research"
+    },
+    "drone_transfer_package": {
+      "name": "Drone Package",
+      "tag": "package"
+    },
+    "drone_transfer_package2": {
+      "name": "Transfer Drone Package",
+      "tag": "package"
+    },
+    "drone_miner_package": {
+      "name": "Miner Drone Package",
+      "tag": "package"
+    },
+    "drone_adv_miner_package": {
+      "name": "Advanced Miner Drone Package",
+      "tag": "package"
+    },
+    "drone_defense_package1": {
+      "name": "Defense Drone Package",
+      "tag": "package"
+    },
+    "flyer_package_m": {
+      "name": "Medium Flyer Package",
+      "tag": "package"
+    },
+    "satellite_package": {
+      "name": "Satellite Package",
+      "tag": "package"
+    },
+    "blight_crystal": {
+      "name": "Blight Crystal Chunk",
+      "tag": "resource"
+    },
+    "blight_extraction": {
+      "name": "Blight Extraction",
+      "tag": "resource"
+    },
+    "blightbar": {
+      "name": "Blight Bar",
+      "tag": "simple_material"
+    },
+    "blight_plasma": {
+      "name": "Blight Plasma",
+      "tag": "simple_material"
+    },
+    "microscope": {
+      "name": "Microscope",
+      "tag": "advanced_material"
+    },
+    "transformer": {
+      "name": "Transformer",
+      "tag": "advanced_material"
+    },
+    "smallreactor": {
+      "name": "Small Modular Reactor",
+      "tag": "advanced_material"
+    },
+    "engine": {
+      "name": "Engines",
+      "tag": "advanced_material"
+    },
+    "datakey": {
+      "name": "Data Key",
+      "tag": "advanced_material"
+    },
+    "alien_core": {
+      "name": "Anomaly Core",
+      "tag": "advanced_material"
+    },
+    "bot_ai_core": {
+      "name": "AI Core",
+      "tag": "hitech_material"
+    },
+    "elain_ai_core": {
+      "name": "ELAIN's AI Core",
+      "tag": "hitech_material"
+    },
+    "broken_ai_core": {
+      "name": "Broken AI Core",
+      "tag": "hitech_material"
+    },
+    "bug_carapace": {
+      "name": "Bug Chitin",
+      "tag": "resource"
+    },
+    "anomaly_particle": {
+      "name": "Anomaly Particle",
+      "tag": "hitech_material"
+    },
+    "anomaly_cluster": {
+      "name": "Dense Anomaly Cluster",
+      "tag": "hitech_material"
+    },
+    "resimulator_core": {
+      "name": "Resimulator Core",
+      "tag": "hitech_material"
+    },
+    "power_petal": {
+      "name": "Power Petal",
+      "tag": "hitech_material"
+    },
+    "phase_leaf": {
+      "name": "Phase Leaf",
+      "tag": "hitech_material"
+    },
+    "virus_source_code": {
+      "name": "Virus Source Code",
+      "tag": "hitech_material"
+    },
+    "rainbow_research": {
+      "name": "MultiCube - CURRENTLY NOT OBTAINABLE",
+      "tag": "research"
+    }
+  }
+}

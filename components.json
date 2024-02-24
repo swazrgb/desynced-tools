@@ -1,0 +1,707 @@
+{
+  "components": {
+    "c_light": {
+      "name": "Light",
+      "attachment_size": "Small"
+    },
+    "c_light_rgb": {
+      "name": "Light RGB",
+      "attachment_size": "Small"
+    },
+    "c_fabricator": {
+      "name": "Fabricator",
+      "attachment_size": "Small"
+    },
+    "c_assembler": {
+      "name": "Assembler",
+      "attachment_size": "Medium"
+    },
+    "c_data_analyzer": {
+      "name": "Data Analyzer",
+      "attachment_size": "Large"
+    },
+    "c_refinery": {
+      "name": "Refinery",
+      "attachment_size": "Medium"
+    },
+    "c_robotics_factory": {
+      "name": "Robotics Assembler",
+      "attachment_size": "Medium"
+    },
+    "c_power_relay": {
+      "name": "Power Field",
+      "attachment_size": "Medium"
+    },
+    "c_portable_relay": {
+      "name": "Portable Power Field",
+      "attachment_size": "Internal"
+    },
+    "c_small_relay": {
+      "name": "Small Power Field",
+      "attachment_size": "Small"
+    },
+    "c_large_power_relay": {
+      "name": "Large Power Field",
+      "attachment_size": "Large"
+    },
+    "c_uplink": {
+      "name": "Uplink",
+      "attachment_size": "Medium"
+    },
+    "c_repairer": {
+      "name": "Repair Component",
+      "attachment_size": "Medium"
+    },
+    "c_repairkit": {
+      "name": "Repair Kit",
+      "attachment_size": "Internal"
+    },
+    "c_repairer_aoe": {
+      "name": "AOE Repair Component",
+      "attachment_size": "Medium"
+    },
+    "c_selfdisassemble": {
+      "name": "Packager"
+    },
+    "c_deployment": {
+      "name": "Deployment"
+    },
+    "c_deployer": {
+      "name": "Deployer",
+      "attachment_size": "Internal"
+    },
+    "c_deploy_construction": {
+      "name": "Deployment Constructor"
+    },
+    "c_construction": {
+      "name": "Constructor"
+    },
+    "c_miner": {
+      "name": "Miner",
+      "attachment_size": "Small"
+    },
+    "c_adv_miner": {
+      "name": "Laser Mining Tool",
+      "attachment_size": "Small"
+    },
+    "c_deconstructor": {
+      "name": "Deconstructor",
+      "attachment_size": "Small"
+    },
+    "c_reconstruction": {
+      "name": "Reconstructor",
+      "attachment_size": "Medium"
+    },
+    "c_turret": {
+      "name": "Turret",
+      "attachment_size": "Medium"
+    },
+    "c_portable_turret": {
+      "name": "Small Turret",
+      "attachment_size": "Small"
+    },
+    "c_adv_portable_turret": {
+      "name": "Small Advanced Turret",
+      "attachment_size": "Small"
+    },
+    "c_portable_turret_red": {
+      "name": "Blight Turret",
+      "attachment_size": "Small"
+    },
+    "c_portable_turret_green": {
+      "name": "Viral Turret",
+      "attachment_size": "Small"
+    },
+    "c_laser_turret": {
+      "name": "Laser Turret",
+      "attachment_size": "Medium"
+    },
+    "c_solar_cell": {
+      "name": "Solar Cell",
+      "attachment_size": "Small"
+    },
+    "c_solar_panel": {
+      "name": "Solar Panel",
+      "attachment_size": "Medium"
+    },
+    "c_wind_turbine": {
+      "name": "Wind Turbine",
+      "attachment_size": "Medium"
+    },
+    "c_wind_turbine_l": {
+      "name": "Large Wind Turbine",
+      "attachment_size": "Large"
+    },
+    "c_power_cell": {
+      "name": "Power Cell",
+      "attachment_size": "Internal"
+    },
+    "c_power_core": {
+      "name": "Power Core",
+      "attachment_size": "Large"
+    },
+    "c_capacitor": {
+      "name": "Capacitor",
+      "attachment_size": "Internal"
+    },
+    "c_integrated_capacitor": {
+      "name": "Integrated Capacitor"
+    },
+    "c_higrade_capacitor": {
+      "name": "Hi-grade Capacitor",
+      "attachment_size": "Internal"
+    },
+    "c_medium_capacitor": {
+      "name": "Medium Capacitor",
+      "attachment_size": "Medium"
+    },
+    "c_small_battery": {
+      "name": "Small Battery",
+      "attachment_size": "Small"
+    },
+    "c_signal_reader": {
+      "name": "Signal Reader",
+      "attachment_size": "Internal"
+    },
+    "c_shared_storage": {
+      "name": "Shared Storage",
+      "attachment_size": "Internal"
+    },
+    "c_internal_storage": {
+      "name": "Internal Storage",
+      "attachment_size": "Internal"
+    },
+    "c_behavior": {
+      "name": "Behavior Controller",
+      "attachment_size": "Internal"
+    },
+    "c_autobase": {
+      "name": "AI Behavior Controller",
+      "attachment_size": "Internal"
+    },
+    "c_crane": {
+      "name": "Item Transporter",
+      "attachment_size": "Medium"
+    },
+    "c_portablecrane": {
+      "name": "Portable Transporter",
+      "attachment_size": "Internal"
+    },
+    "c_internal_crane1": {
+      "name": "Item Transporter",
+      "attachment_size": "Internal"
+    },
+    "c_internal_crane2": {
+      "name": "Item Transporter",
+      "attachment_size": "Internal"
+    },
+    "c_portable_radar": {
+      "name": "Portable Radar",
+      "attachment_size": "Internal"
+    },
+    "c_scout_radar": {
+      "name": "Scout Radar"
+    },
+    "c_small_radar": {
+      "name": "Small Radar",
+      "attachment_size": "Small"
+    },
+    "c_radio_storage": {},
+    "c_radio_transmitter": {
+      "name": "Radio Transmitter",
+      "attachment_size": "Internal"
+    },
+    "c_radio_receiver": {
+      "name": "Radio Receiver",
+      "attachment_size": "Internal"
+    },
+    "c_crystal_power": {
+      "name": "Crystal Power",
+      "attachment_size": "Small"
+    },
+    "c_power_transmitter": {
+      "name": "Power Transmitter",
+      "attachment_size": "Medium"
+    },
+    "c_signpost": {
+      "name": "Sign Post",
+      "attachment_size": "Internal"
+    },
+    "c_modulehealth": {
+      "name": "Internal Health Module",
+      "attachment_size": "Internal"
+    },
+    "c_modulehealth_s": {
+      "name": "Small Health Module",
+      "attachment_size": "Small"
+    },
+    "c_modulehealth_m": {
+      "name": "Medium Health Module",
+      "attachment_size": "Medium"
+    },
+    "c_modulehealth_l": {
+      "name": "Large Health Module",
+      "attachment_size": "Large"
+    },
+    "c_modulevisibility": {
+      "name": "Internal Visibility Module",
+      "attachment_size": "Internal"
+    },
+    "c_modulevisibility_s": {
+      "name": "Small Visibility Module",
+      "attachment_size": "Small"
+    },
+    "c_modulevisibility_m": {
+      "name": "Medium Visibility Module",
+      "attachment_size": "Medium"
+    },
+    "c_modulevisibility_l": {
+      "name": "Large Visibility Module",
+      "attachment_size": "Large"
+    },
+    "c_moduleefficiency": {
+      "name": "Internal Efficiency Module",
+      "attachment_size": "Internal"
+    },
+    "c_moduleefficiency_s": {
+      "name": "Small Efficiency Module",
+      "attachment_size": "Small"
+    },
+    "c_moduleefficiency_m": {
+      "name": "Medium Efficiency Module",
+      "attachment_size": "Medium"
+    },
+    "c_moduleefficiency_l": {
+      "name": "Large Efficiency Module",
+      "attachment_size": "Large"
+    },
+    "c_modulespeed": {
+      "name": "Internal Speed Module",
+      "attachment_size": "Internal"
+    },
+    "c_modulespeed_s": {
+      "name": "Small Speed Module",
+      "attachment_size": "Small"
+    },
+    "c_modulespeed_m": {
+      "name": "Medium Speed Module",
+      "attachment_size": "Medium"
+    },
+    "c_modulespeed_l": {
+      "name": "Large Speed Module",
+      "attachment_size": "Large"
+    },
+    "c_particle_birds": {
+      "attachment_size": "Internal"
+    },
+    "c_particle_leaves": {},
+    "c_glitch": {
+      "name": "Glitch",
+      "attachment_size": "Internal"
+    },
+    "c_trilobyte_consume": {
+      "name": "Trilobyte Consume",
+      "attachment_size": "Internal"
+    },
+    "c_trilobyte_attack": {
+      "name": "Trilobyte Attack",
+      "attachment_size": "Hidden"
+    },
+    "c_trilobyte_attack1": {},
+    "c_trilobyte_attack2": {},
+    "c_trilobyte_attack3": {},
+    "c_trilobyte_attack4": {},
+    "c_damageself": {
+      "name": "Damage on Trigger"
+    },
+    "c_small_storage": {
+      "name": "Small Storage",
+      "attachment_size": "Small"
+    },
+    "c_shield_generator": {
+      "name": "Portable Shield Generator",
+      "attachment_size": "Internal"
+    },
+    "c_destroyself": {
+      "name": "Destroy on Trigger"
+    },
+    "c_disappear_empty": {
+      "name": "Glitch Building"
+    },
+    "c_ai_bot_behavior": {
+      "name": "AI Bot"
+    },
+    "c_phase_plant": {
+      "name": "Phase Plant"
+    },
+    "c_damage_plant": {
+      "name": "Damage Plant"
+    },
+    "c_damage_plant_internal": {
+      "name": "Damage Planet Internal"
+    },
+    "c_bug_homeless": {
+      "name": "Homeless Bug"
+    },
+    "c_bug_spawn": {
+      "name": "Bug Hive Spawner"
+    },
+    "c_bug_spawner_large": {},
+    "c_explorable_scannable": {
+      "name": "Intel Scanner"
+    },
+    "c_explorable_fix": {
+      "name": "Repair Required"
+    },
+    "c_explorable_fix_lvl2": {
+      "name": "Datakey Socket"
+    },
+    "c_explorable_autosolve": {},
+    "c_virus": {
+      "name": "Virus",
+      "attachment_size": "Internal"
+    },
+    "c_virus_protection": {
+      "name": "Virus Protection",
+      "attachment_size": "Internal"
+    },
+    "c_small_scanner": {
+      "name": "Small Intel Scanner",
+      "attachment_size": "Small"
+    },
+    "c_simulation_interface": {
+      "name": "Simulation Interface",
+      "attachment_size": "Internal"
+    },
+    "c_human_factory": {
+      "name": "Human Factory",
+      "attachment_size": "Internal"
+    },
+    "c_alien_key": {
+      "name": "Alien Decryption Key",
+      "attachment_size": "Internal"
+    },
+    "c_alien_lock": {
+      "name": "Alien Lock"
+    },
+    "c_resimulator": {
+      "name": "Re-simulator Core"
+    },
+    "c_virus_ac": {
+      "name": "Artificial Virus Core",
+      "attachment_size": "Internal"
+    },
+    "c_blight_ac": {
+      "name": "Artificial Blight Core",
+      "attachment_size": "Internal"
+    },
+    "c_robot_ac": {
+      "name": "Artificial Robot Core",
+      "attachment_size": "Internal"
+    },
+    "c_human_ac": {
+      "name": "Artificial Human Core",
+      "attachment_size": "Internal"
+    },
+    "c_alien_ac": {
+      "name": "Artificial Alien Core",
+      "attachment_size": "Internal"
+    },
+    "c_extractor": {
+      "name": "Laser Extractor",
+      "attachment_size": "Medium"
+    },
+    "c_blight_extractor": {
+      "name": "Blight Extractor",
+      "attachment_size": "Small"
+    },
+    "c_virus_cure": {
+      "name": "Virus Cure",
+      "attachment_size": "Internal"
+    },
+    "c_large_storage": {
+      "name": "Large Storage",
+      "attachment_size": "Large"
+    },
+    "c_virus_container_i": {
+      "name": "Internal Virus Containment",
+      "attachment_size": "Internal"
+    },
+    "c_anomaly_container_i": {
+      "name": "Internal Anomaly Containment",
+      "attachment_size": "Internal"
+    },
+    "c_unit_teleport": {
+      "name": "Unit Teleporter",
+      "attachment_size": "Large"
+    },
+    "c_repairport": {
+      "name": "Repair Garage",
+      "attachment_size": "Medium"
+    },
+    "c_satellite_launcher": {
+      "name": "Satellite Launcher",
+      "attachment_size": "Large"
+    },
+    "c_satellite": {
+      "name": "Satellite Unit"
+    },
+    "c_hacking_tool": {
+      "name": "Hacking Tool",
+      "attachment_size": "Small"
+    },
+    "c_plasma_turret": {
+      "name": "Plasma Turret",
+      "attachment_size": "Small"
+    },
+    "c_plasma_cannon": {
+      "name": "Plasma Cannon",
+      "attachment_size": "Medium"
+    },
+    "c_photon_cannon": {
+      "name": "Photon Cannon",
+      "attachment_size": "Medium"
+    },
+    "c_missile_turret": {
+      "name": "Missile Launcher",
+      "attachment_size": "Large"
+    },
+    "c_human_tank_turret": {
+      "name": "Tank Turret",
+      "attachment_size": "Medium"
+    },
+    "c_power_unit": {
+      "name": "Power Unit",
+      "attachment_size": "Small"
+    },
+    "c_blight_power": {
+      "name": "Blight Power Generator",
+      "attachment_size": "Medium"
+    },
+    "c_fusion_generator": {
+      "name": "Fusion Generator"
+    },
+    "c_battery": {
+      "name": "Medium Battery",
+      "attachment_size": "Medium"
+    },
+    "c_large_battery": {
+      "name": "Large Battery",
+      "attachment_size": "Large"
+    },
+    "c_large_power_transmitter": {
+      "name": "Large Power Transmitter",
+      "attachment_size": "Large"
+    },
+    "c_medium_storage": {
+      "name": "Medium Storage",
+      "attachment_size": "Medium"
+    },
+    "c_drone_launcher": {
+      "name": "Drone Launcher",
+      "attachment_size": "Medium"
+    },
+    "c_drone_port": {
+      "name": "Drone Port",
+      "attachment_size": "Small"
+    },
+    "c_drone_comp": {
+      "name": "Drone Component",
+      "attachment_size": "Internal"
+    },
+    "c_landing_pad": {
+      "name": "Landing Pad",
+      "attachment_size": "Large"
+    },
+    "c_launch_pad": {
+      "name": "Launch Pad",
+      "attachment_size": "Internal"
+    },
+    "c_blight_shield": {
+      "name": "Blight Charger",
+      "attachment_size": "Internal"
+    },
+    "c_radar": {
+      "name": "Long-range Radar",
+      "attachment_size": "Medium"
+    },
+    "c_alien_translator": {
+      "name": "Alien Translator",
+      "attachment_size": "Internal"
+    },
+    "c_terraformer": {
+      "name": "Purifying Terraformer",
+      "attachment_size": "Internal"
+    },
+    "c_blight_terraformer": {
+      "name": "Alien Terraformer",
+      "attachment_size": "Internal"
+    },
+    "c_shield_generator2": {
+      "name": "Shield Generator"
+    },
+    "c_shield_generator3": {
+      "name": "Hyper Shield Generator"
+    },
+    "c_alien_container_i": {
+      "name": "Internal Alien Container",
+      "attachment_size": "Internal"
+    },
+    "c_blight_container_i": {
+      "name": "Internal Blight Container",
+      "attachment_size": "Internal"
+    },
+    "c_blight_container_s": {
+      "name": "Blight Container Small",
+      "attachment_size": "Small"
+    },
+    "c_blight_container_m": {
+      "name": "Blight Container Medium",
+      "attachment_size": "Medium"
+    },
+    "c_alien_liquid_fx": {
+      "name": "Alien Liquid",
+      "attachment_size": "Internal"
+    },
+    "c_virus_decomposer": {
+      "name": "Robot Hive",
+      "attachment_size": "Large"
+    },
+    "c_virus_turret": {
+      "name": "Virus Bug Turret",
+      "attachment_size": "Medium"
+    },
+    "c_virus_bitlock": {
+      "name": "Crypto BitLock",
+      "attachment_size": "Medium"
+    },
+    "c_virus_bitlock_effect": {
+      "name": "BitLock Effect",
+      "attachment_size": "Internal"
+    },
+    "c_virus_possess": {
+      "name": "Blight Destabilizer",
+      "attachment_size": "Medium"
+    },
+    "c_virus_recycler": {
+      "name": "Component Recycler",
+      "attachment_size": "Medium"
+    },
+    "c_virus_jamming": {
+      "name": "Virus Ray",
+      "attachment_size": "Medium"
+    },
+    "c_virus_possessor": {
+      "name": "Virus Possessor",
+      "attachment_size": "Medium"
+    },
+    "c_blight_magnifier": {
+      "name": "Blight Magnifier",
+      "attachment_size": "Medium"
+    },
+    "c_blight_antenna": {
+      "name": "Blight Stabilizer",
+      "attachment_size": "Medium"
+    },
+    "c_blight_converter": {
+      "name": "Resource Converter",
+      "attachment_size": "Medium"
+    },
+    "c_blight_control": {
+      "name": "Blight Control Tower",
+      "attachment_size": "Medium"
+    },
+    "c_alien_core": {
+      "name": "Alien_Core",
+      "attachment_size": "Internal"
+    },
+    "c_alien_unit": {
+      "name": "Alien Unit",
+      "attachment_size": "Internal"
+    },
+    "c_alien_attack": {
+      "name": "Alien Attack",
+      "attachment_size": "Internal"
+    },
+    "c_alien_miner": {
+      "name": "Alien Miner",
+      "attachment_size": "Internal"
+    },
+    "c_alien_extractor": {
+      "name": "Alien Extractor",
+      "attachment_size": "Internal"
+    },
+    "c_alien_feeder": {
+      "name": "Alien Feeder",
+      "attachment_size": "Internal"
+    },
+    "c_alien_factory": {
+      "name": "Alien Factory",
+      "attachment_size": "Internal"
+    },
+    "c_human_refinery": {
+      "name": "Human Refinery",
+      "attachment_size": "Internal"
+    },
+    "c_human_factory_robots": {
+      "name": "Human Factory",
+      "attachment_size": "Large"
+    },
+    "c_human_science_analyzer_robots": {
+      "name": "Human Science Analyzer",
+      "attachment_size": "Large"
+    },
+    "c_human_commandcenter": {
+      "name": "Human Command Center",
+      "attachment_size": "Internal"
+    },
+    "c_human_barracks": {
+      "name": "Human Barracks",
+      "attachment_size": "Internal"
+    },
+    "c_human_spaceport": {
+      "name": "Human Spaceport",
+      "attachment_size": "Internal"
+    },
+    "c_human_science": {
+      "name": "Human Science",
+      "attachment_size": "Internal"
+    },
+    "c_alien_research": {
+      "name": "Alien Research",
+      "attachment_size": "Internal"
+    },
+    "c_mothership_repair": {
+      "name": "Mothership Repairs",
+      "attachment_size": "Internal"
+    },
+    "c_mothership_eject": {
+      "name": "Mothership Eject",
+      "attachment_size": "Hidden"
+    },
+    "c_santahat": {
+      "name": "Santa Hat",
+      "attachment_size": "Medium"
+    },
+    "c_antlers1s": {
+      "name": "Antlers",
+      "attachment_size": "Small"
+    },
+    "c_antlersnose1s": {
+      "name": "Antlers Nose",
+      "attachment_size": "Small"
+    },
+    "c_present1s": {
+      "name": "Present",
+      "attachment_size": "Small"
+    },
+    "c_anomaly_go_home": {},
+    "c_carrier_factory": {
+      "name": "Robot Factory"
+    },
+    "c_anomaly_event": {
+      "name": "Anomaly",
+      "attachment_size": "Internal"
+    }
+  }
+}

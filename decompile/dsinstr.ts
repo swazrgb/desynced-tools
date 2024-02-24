@@ -1026,8 +1026,8 @@ export const instructions:{[key:string]:InstrInfo} = {
       1
     ],
     "conditions": {
-      "next": true,
-      "Component Equipped": false
+      "next": false,
+      "Component Equipped": true
     }
   },
   "shutdown": {

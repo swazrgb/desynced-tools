@@ -1,0 +1,425 @@
+{
+  "values": {
+    "v_signal_a": {
+      "tag": "alien_signal",
+      "name": "?"
+    },
+    "v_signal_b": {
+      "tag": "alien_signal",
+      "name": "?"
+    },
+    "v_signal_c": {
+      "tag": "alien_signal",
+      "name": "?"
+    },
+    "v_signal_d": {
+      "tag": "alien_signal",
+      "name": "?"
+    },
+    "v_signal_e": {
+      "tag": "alien_signal",
+      "name": "?"
+    },
+    "v_color_red": {
+      "tag": "color",
+      "name": "Red"
+    },
+    "v_color_green": {
+      "tag": "color",
+      "name": "Green"
+    },
+    "v_color_blue": {
+      "tag": "color",
+      "name": "Blue"
+    },
+    "v_color_yellow": {
+      "tag": "color",
+      "name": "Yellow"
+    },
+    "v_color_cyan": {
+      "tag": "color",
+      "name": "Cyan"
+    },
+    "v_color_magenta": {
+      "tag": "color",
+      "name": "Magenta"
+    },
+    "v_color_black": {
+      "tag": "color",
+      "name": "Black"
+    },
+    "v_color_brown": {
+      "tag": "color",
+      "name": "Brown"
+    },
+    "v_color_crimson": {
+      "tag": "color",
+      "name": "Crimson"
+    },
+    "v_color_dark_grey": {
+      "tag": "color",
+      "name": "Dark Gray"
+    },
+    "v_color_light_green": {
+      "tag": "color",
+      "name": "Light Green"
+    },
+    "v_color_light_grey": {
+      "tag": "color",
+      "name": "Light Gray"
+    },
+    "v_color_pink": {
+      "tag": "color",
+      "name": "Pink"
+    },
+    "v_color_white": {
+      "tag": "color",
+      "name": "White"
+    },
+    "v_color_pastel": {
+      "tag": "color",
+      "name": "Pastel"
+    },
+    "v_own_faction": {
+      "tag": "entityfilter",
+      "name": "Owned"
+    },
+    "v_ally_faction": {
+      "tag": "entityfilter",
+      "name": "Ally"
+    },
+    "v_enemy_faction": {
+      "tag": "entityfilter",
+      "name": "Enemy"
+    },
+    "v_world_faction": {
+      "tag": "entityfilter",
+      "name": "World"
+    },
+    "v_bot": {
+      "tag": "entityfilter",
+      "name": "Unit"
+    },
+    "v_building": {
+      "tag": "entityfilter",
+      "name": "Building"
+    },
+    "v_is_foundation": {
+      "tag": "entityfilter",
+      "name": "Foundation"
+    },
+    "v_construction": {
+      "tag": "entityfilter",
+      "name": "Construction"
+    },
+    "v_droppeditem": {
+      "tag": "entityfilter",
+      "name": "Dropped Item"
+    },
+    "v_resource": {
+      "tag": "entityfilter",
+      "name": "Resource"
+    },
+    "v_mineable": {
+      "tag": "entityfilter",
+      "name": "Mineable"
+    },
+    "v_anomaly": {
+      "tag": "entityfilter",
+      "name": "Anomaly"
+    },
+    "v_valley": {
+      "tag": "entityfilter",
+      "name": "Valley"
+    },
+    "v_plateau": {
+      "tag": "entityfilter",
+      "name": "Plateau"
+    },
+    "v_not_blight": {
+      "tag": "entityfilter",
+      "name": "Not Blight"
+    },
+    "v_blight": {
+      "tag": "entityfilter",
+      "name": "Blight"
+    },
+    "v_alien_faction": {
+      "tag": "entityfilter",
+      "name": "Alien"
+    },
+    "v_human_faction": {
+      "tag": "entityfilter",
+      "name": "Human"
+    },
+    "v_robot_faction": {
+      "tag": "entityfilter",
+      "name": "Robot"
+    },
+    "v_bug_faction": {
+      "tag": "entityfilter",
+      "name": "Bug"
+    },
+    "v_solved": {
+      "tag": "entityfilter",
+      "name": "Solved"
+    },
+    "v_unsolved": {
+      "tag": "entityfilter",
+      "name": "Unsolved"
+    },
+    "v_can_loot": {
+      "tag": "entityfilter",
+      "name": "Can Loot"
+    },
+    "v_in_powergrid": {
+      "tag": "entityfilter",
+      "name": "In Power Grid"
+    },
+    "v_mothership": {
+      "tag": "entityfilter",
+      "name": "Mothership"
+    },
+    "v_notify": {},
+    "v_arrow_up": {
+      "tag": "value",
+      "name": "Arrow Up"
+    },
+    "v_arrow_down": {
+      "tag": "value",
+      "name": "Arrow Down"
+    },
+    "v_arrow_left": {
+      "tag": "value",
+      "name": "Arrow Left"
+    },
+    "v_arrow_right": {
+      "tag": "value",
+      "name": "Arrow Right"
+    },
+    "v_arrow_upleft": {
+      "tag": "value",
+      "name": "Arrow Up Left"
+    },
+    "v_arrow_upright": {
+      "tag": "value",
+      "name": "Arrow Up Right"
+    },
+    "v_arrow_downleft": {
+      "tag": "value",
+      "name": "Arrow Down left"
+    },
+    "v_arrow_downright": {
+      "tag": "value",
+      "name": "Arrow Down Right"
+    },
+    "v_transport_route": {
+      "tag": "value",
+      "name": "Transport Route"
+    },
+    "v_octagon": {
+      "tag": "value",
+      "name": "Octagon"
+    },
+    "v_pentagon": {
+      "tag": "value",
+      "name": "Pentagon"
+    },
+    "v_star": {
+      "tag": "value",
+      "name": "Star"
+    },
+    "v_letter_A": {
+      "tag": "value",
+      "name": "A"
+    },
+    "v_letter_B": {
+      "tag": "value",
+      "name": "B"
+    },
+    "v_letter_C": {
+      "tag": "value",
+      "name": "C"
+    },
+    "v_letter_D": {
+      "tag": "value",
+      "name": "D"
+    },
+    "v_letter_E": {
+      "tag": "value",
+      "name": "E"
+    },
+    "v_letter_F": {
+      "tag": "value",
+      "name": "F"
+    },
+    "v_letter_G": {
+      "tag": "value",
+      "name": "G"
+    },
+    "v_letter_H": {
+      "tag": "value",
+      "name": "H"
+    },
+    "v_letter_I": {
+      "tag": "value",
+      "name": "I"
+    },
+    "v_letter_J": {
+      "tag": "value",
+      "name": "J"
+    },
+    "v_letter_K": {
+      "tag": "value",
+      "name": "K"
+    },
+    "v_letter_L": {
+      "tag": "value",
+      "name": "L"
+    },
+    "v_letter_M": {
+      "tag": "value",
+      "name": "M"
+    },
+    "v_letter_N": {
+      "tag": "value",
+      "name": "N"
+    },
+    "v_letter_O": {
+      "tag": "value",
+      "name": "O"
+    },
+    "v_letter_P": {
+      "tag": "value",
+      "name": "P"
+    },
+    "v_letter_Q": {
+      "tag": "value",
+      "name": "Q"
+    },
+    "v_letter_R": {
+      "tag": "value",
+      "name": "R"
+    },
+    "v_letter_S": {
+      "tag": "value",
+      "name": "S"
+    },
+    "v_letter_T": {
+      "tag": "value",
+      "name": "T"
+    },
+    "v_letter_U": {
+      "tag": "value",
+      "name": "U"
+    },
+    "v_letter_V": {
+      "tag": "value",
+      "name": "V"
+    },
+    "v_letter_W": {
+      "tag": "value",
+      "name": "W"
+    },
+    "v_letter_X": {
+      "tag": "value",
+      "name": "X"
+    },
+    "v_letter_Y": {
+      "tag": "value",
+      "name": "Y"
+    },
+    "v_letter_Z": {
+      "tag": "value",
+      "name": "Z"
+    },
+    "v_number_0": {
+      "tag": "value",
+      "name": "0"
+    },
+    "v_number_1": {
+      "tag": "value",
+      "name": "1"
+    },
+    "v_number_2": {
+      "tag": "value",
+      "name": "2"
+    },
+    "v_number_3": {
+      "tag": "value",
+      "name": "3"
+    },
+    "v_number_4": {
+      "tag": "value",
+      "name": "4"
+    },
+    "v_number_5": {
+      "tag": "value",
+      "name": "5"
+    },
+    "v_number_6": {
+      "tag": "value",
+      "name": "6"
+    },
+    "v_number_7": {
+      "tag": "value",
+      "name": "7"
+    },
+    "v_number_8": {
+      "tag": "value",
+      "name": "8"
+    },
+    "v_number_9": {
+      "tag": "value",
+      "name": "9"
+    },
+    "v_lock_locked": {
+      "tag": "value",
+      "name": "Locked"
+    },
+    "v_lock_unlocked": {
+      "tag": "value",
+      "name": "Unlocked"
+    },
+    "v_alert": {
+      "tag": "value",
+      "name": "Unlocked"
+    },
+    "v_damaged": {
+      "tag": "entityfilter",
+      "name": "Damaged"
+    },
+    "v_infected": {
+      "tag": "entityfilter",
+      "name": "Infected"
+    },
+    "v_broken": {
+      "tag": "entityfilter",
+      "name": "Broken"
+    },
+    "v_unpowered": {
+      "tag": "entityfilter",
+      "name": "Unpowered"
+    },
+    "v_emergency": {
+      "tag": "entityfilter",
+      "name": "Emergency"
+    },
+    "v_powereddown": {
+      "tag": "entityfilter",
+      "name": "PoweredDown"
+    },
+    "v_moving": {
+      "tag": "entityfilter",
+      "name": "Moving"
+    },
+    "v_pathblocked": {
+      "tag": "entityfilter",
+      "name": "PathBlocked"
+    },
+    "v_idle": {
+      "tag": "entityfilter",
+      "name": "Idle"
+    }
+  }
+}

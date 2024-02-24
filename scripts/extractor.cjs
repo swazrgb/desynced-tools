@@ -25,13 +25,34 @@ for (let i = 2; i < process.argv.length; i++) {
   for (const stmt of ast.body) {
     if (stmt.type === "AssignmentStatement") {
       extractAssignment(stmt, data);
-    } else if (stmt.type === "CallStatement") {
-      extractCall(stmt.expression, data);
     }
   }
 
+  walk(ast.body, node => {
+    if (node.type === "CallExpression") {
+      extractCall(node, data);
+    }
+  })
+
   const outfilename = path.basename(file, ".lua") + ".json";
   fs.writeFileSync(outfilename, JSON.stringify(data, null, 2));
+}
+
+function walk(node, fn) {
+  if(typeof node !== 'object') return false;
+  if(fn(node) === false) return false;
+  if(Array.isArray(node)) {
+    for(const child of node) {
+      walk(child, fn);
+    }
+    return;
+  }
+
+  for(const key of Object.keys(node)) {
+    const child = node[key];
+    if(child == null || typeof child !== 'object') continue;
+    walk(child, fn);
+  }
 }
 
 function extractAssignment(stmt, data) {
