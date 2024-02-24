@@ -7,6 +7,7 @@ import {Code} from "./ir/code";
 import {Arg, Instruction, Label, LiteralValue, RegRef, Stop, StringLiteral, VariableRef,} from "./ir/instruction";
 import {generateAsm} from "./decompile/disasm";
 import {getDataByIdOrName} from "./data";
+import exp from "node:constants";
 
 // Some arbitrary things to use for dynamic jump labels
 const dynamicLabels = [
@@ -572,11 +573,12 @@ class Compiler {
         if (cond) {
           let literal = this.#conditionLiteral(cond);
           if (literal == undefined) {
-            const condExpr = this.compileCondition(cond, undefined);
-            this.#rewriteLabel(condExpr.ref, body);
-            condExpr.variable.exec!.forEach((v) => {
-              this.#rewriteLabel(v, brk, true);
-            });
+            // const condExpr =
+            this.compileCondition(cond, undefined, body, brk);
+            // this.#rewriteLabel(condExpr.ref, body);
+            // condExpr.variable.exec!.forEach((v) => {
+            //   this.#rewriteLabel(v, brk, true);
+            // });
           } else if (!literal) {
             this.#jump(brk);
           }
@@ -1289,6 +1291,13 @@ class Compiler {
     }
   }
 
+  #applyConditionJump(variable: Variable, ref: ArgRef, trueLabel: string, falseLabel: string) {
+    this.#rewriteLabel(ref, trueLabel);
+    variable.exec?.forEach((v) => {
+      this.#rewriteLabel(v, falseLabel, true);
+    })
+  }
+
   compileIf(s: ts.IfStatement, dest?: Variable, parentEnd?: string) {
     if (s.expression.kind === ts.SyntaxKind.TrueKeyword) {
       this.compileStatement(s.thenStatement);
@@ -1299,41 +1308,49 @@ class Compiler {
       }
       return;
     }
-    const { variable, ref } = this.compileCondition(s.expression, dest);
-    const end = parentEnd || this.#label();
+
+    const end = this.#label();
     const then = this.#label();
-    this.#rewriteLabel(ref, then);
+    const elseLabel = this.#label();
+    const nextLabel = s.elseStatement ? elseLabel : end;
+
+    this.compileCondition(s.expression, dest, then, nextLabel);
+
     this.#emitLabel(then);
     this.currentScope.withNewVariableScope(() => {
       this.compileStatement(s.thenStatement);
     });
-    this.#jump(end);
+    this.#jump(parentEnd || end);
+
     if (s.elseStatement) {
-      const elseLabel = this.#label();
-        variable.exec?.forEach((v) => {
-          this.#rewriteLabel(v, elseLabel, true);
-        });
+        // variable.exec?.forEach((v) => {
+        //   this.#rewriteLabel(v, nextLabel, true);
+        // });
         this.#emitLabel(elseLabel);
         const { elseStatement } = s;
+
       if (ts.isIfStatement(elseStatement)) {
         // this.compileIf(s.elseStatement, variable, end);
         // const elseStatement = s.elseStatement;
         // this.currentScope.withNewVariableScope(() => {
-          this.compileIf(elseStatement, undefined, parentEnd);
+
+          this.compileIf(elseStatement, undefined, end);
         // });
       } else {
         this.currentScope.withNewVariableScope(() => {
           this.compileStatement(elseStatement);
         });
       }
-      this.#jump(end);
+      // this.#jump(end);
     }
-    if (!parentEnd) {
-      variable.exec?.forEach((v) => {
-        this.#rewriteLabel(v, end, true);
-      });
-      this.#emitLabel(end);
-    }
+
+    this.#emitLabel(end);
+
+
+    // variable.exec?.forEach((v) => {
+    //   this.#rewriteLabel(v, end, true);
+    // });
+
   }
 
   #jump(label: string) {
@@ -1346,8 +1363,10 @@ class Compiler {
 
   compileCondition(
     expression: ts.Expression,
-    dest: Variable | undefined
-  ): { variable: Variable; ref: ArgRef } {
+    dest: Variable | undefined,
+    trueLabel: string,
+    falseLabel: string,
+  ): void {
     let variable: Variable;
     let key: string | boolean;
     let extraKey: string | undefined;
@@ -1367,7 +1386,8 @@ class Compiler {
       if (expression.operator !== ts.SyntaxKind.ExclamationToken) {
         this.#error("unsupported prefix operator", expression);
       }
-      return this.#negate(this.compileCondition(expression.operand, dest));
+      // return this.#negate(this.compileCondition(expression.operand, dest, trueLabel, falseLabel));
+      return this.compileCondition(expression.operand, dest, falseLabel, trueLabel);
     } else if (ts.isBinaryExpression(expression)) {
       switch (expression.operatorToken.kind) {
         case ts.SyntaxKind.EqualsToken:
@@ -1377,10 +1397,11 @@ class Compiler {
           break;
         case ts.SyntaxKind.EqualsEqualsEqualsToken:
         case ts.SyntaxKind.EqualsEqualsToken:
-          return this.#compileEquality(expression, dest);
+          return this.#compileEquality(expression, dest, trueLabel, falseLabel);
         case ts.SyntaxKind.ExclamationEqualsToken:
         case ts.SyntaxKind.ExclamationEqualsEqualsToken:
-          return this.#negate(this.#compileEquality(expression, dest));
+          // return this.#negate(this.#compileEquality(expression, dest, trueLabel, falseLabel));
+          return this.#compileEquality(expression, dest, falseLabel, trueLabel);
         case ts.SyntaxKind.LessThanEqualsToken:
           extraKey = "=";
           // fallthrough
@@ -1388,10 +1409,10 @@ class Compiler {
           key = "<";
           assertNoDest();
           variable = this.compileResolvedCall(
-            expression,
-            "compareNumber",
-            undefined,
-            [getNumeric(expression.left), getNumeric(expression.right)]
+              expression,
+              "compareNumber",
+              undefined,
+              [getNumeric(expression.left), getNumeric(expression.right)]
           );
           break;
         case ts.SyntaxKind.GreaterThanEqualsToken:
@@ -1401,18 +1422,34 @@ class Compiler {
           key = ">";
           assertNoDest();
           variable = this.compileResolvedCall(
-            expression,
-            "compareNumber",
-            undefined,
-            [getNumeric(expression.left), getNumeric(expression.right)]
+              expression,
+              "compareNumber",
+              undefined,
+              [getNumeric(expression.left), getNumeric(expression.right)]
           );
           break;
+        case ts.SyntaxKind.AmpersandAmpersandToken: {
+          const l = this.#label();
+          this.compileCondition(expression.left, undefined, l, falseLabel);
+          this.#emitLabel(l);
+          this.compileCondition(expression.right, undefined, trueLabel, falseLabel);
+          return;
+        }
+        case ts.SyntaxKind.BarBarToken: {
+          const l = this.#label();
+          this.compileCondition(expression.left, undefined, trueLabel, l);
+          this.#emitLabel(l);
+          this.compileCondition(expression.right, undefined, trueLabel, falseLabel);
+          return;
+        }
         default:
           this.#error(
-            `unsupported condition ${expression.operatorToken.getText()}`,
-            expression
+              `unsupported condition ${expression.operatorToken.getText()}`,
+              expression
           );
       }
+    } else if (ts.isParenthesizedExpression(expression)) {
+      return this.compileCondition(expression.expression, dest, trueLabel, falseLabel);
     } else {
       this.#error(
         `unsupported condition ${expression.kind} ${
@@ -1427,7 +1464,10 @@ class Compiler {
         extraArg: variable.exec!.get(extraKey)!.arg,
       });
     }
-    return { variable, ref };
+
+    this.#applyConditionJump(variable, ref, trueLabel, falseLabel);
+
+    // return { variable, ref };
   }
 
   #conditionLiteral(value: ts.Expression) {
@@ -1447,8 +1487,10 @@ class Compiler {
 
   #compileEquality(
     expression: ts.BinaryExpression,
-    dest: Variable | undefined
-  ): { variable: Variable; ref: ArgRef } {
+    dest: Variable | undefined,
+    trueLabel: string,
+    falseLabel: string
+  ): void {
     let variable: Variable | undefined;
     let key: string | boolean = true;
     const assertNoDest = () => {
@@ -1472,19 +1514,18 @@ class Compiler {
           undefined,
           [expression.left, expression.right]
         );
-        return { variable, ref: variable.exec!.get(true)! };
+        this.#applyConditionJump(variable, variable.exec!.get(true)!, trueLabel, falseLabel);
+        return;
       }
     }
     if (expression.left.kind === ts.SyntaxKind.TrueKeyword) {
-      return this.compileCondition(expression.right, dest);
+      return this.compileCondition(expression.right, dest, trueLabel, falseLabel);
     } else if (expression.right.kind === ts.SyntaxKind.TrueKeyword) {
-      return this.compileCondition(expression.left, dest);
+      return this.compileCondition(expression.left, dest, trueLabel, falseLabel);
     } else if (expression.left.kind === ts.SyntaxKind.FalseKeyword) {
-      ({ variable } = this.compileCondition(expression.right, dest));
-      key = false;
+      return this.compileCondition(expression.right, dest, falseLabel, trueLabel);
     } else if (expression.right.kind === ts.SyntaxKind.FalseKeyword) {
-      ({ variable } = this.compileCondition(expression.right, dest));
-      key = false;
+      return this.compileCondition(expression.right, dest, falseLabel, trueLabel);
     } else if (isNumeric(expression.left) || isNumeric(expression.right)) {
       assertNoDest();
       variable = this.compileResolvedCall(
@@ -1509,51 +1550,53 @@ class Compiler {
         [expression.left, expression.right]
       );
     }
-    return { variable, ref: variable.exec!.get(key)! };
+
+    this.#applyConditionJump(variable, variable.exec!.get(key)!, trueLabel, falseLabel);
+    // return { variable, ref:  };
   }
 
-  #negate({ variable, ref }: { variable: Variable; ref: ArgRef }): {
-    variable: Variable;
-    ref: ArgRef;
-  } {
-    const negations: { [key: string]: string } = {
-      false: "true",
-      true: "false",
-      "<=": ">",
-      "<": ">=",
-      "=": "<>",
-      "<>": "=",
-      ">=": "<",
-      ">": "<=",
-    };
-    let key1: string | boolean | undefined;
-    let key2: string | boolean | undefined;
-    variable.exec!.forEach((v, k) => {
-      if (v.arg === ref.arg) {
-        key1 = k;
-      } else if (v.arg === ref.extraArg) {
-        key2 = k;
-      }
-    });
-    if (!key1) {
-      throw new Error("Invalid ref");
-    }
-    const negatedKey = negations[`${key1}${key2 || ""}`];
-    if (!negatedKey) {
-      throw new Error(`cannot negate ${key1}`);
-    }
-    if (negatedKey.length === 2) {
-      ref = Object.assign({}, variable.exec!.get(negatedKey[0])!);
-      ref.extraArg = variable.exec!.get(negatedKey[1])!.arg;
-      return { variable, ref };
-    } else if (negatedKey.length === 1) {
-      ref = variable.exec!.get(negatedKey)!;
-      return { variable, ref };
-    } else {
-      ref = variable.exec!.get(JSON.parse(negatedKey))!;
-      return { variable, ref };
-    }
-  }
+  // #negate({ variable, ref }: { variable: Variable; ref: ArgRef }): {
+  //   variable: Variable;
+  //   ref: ArgRef;
+  // } {
+  //   const negations: { [key: string]: string } = {
+  //     false: "true",
+  //     true: "false",
+  //     "<=": ">",
+  //     "<": ">=",
+  //     "=": "<>",
+  //     "<>": "=",
+  //     ">=": "<",
+  //     ">": "<=",
+  //   };
+  //   let key1: string | boolean | undefined;
+  //   let key2: string | boolean | undefined;
+  //   variable.exec!.forEach((v, k) => {
+  //     if (v.arg === ref.arg) {
+  //       key1 = k;
+  //     } else if (v.arg === ref.extraArg) {
+  //       key2 = k;
+  //     }
+  //   });
+  //   if (!key1) {
+  //     throw new Error("Invalid ref");
+  //   }
+  //   const negatedKey = negations[`${key1}${key2 || ""}`];
+  //   if (!negatedKey) {
+  //     throw new Error(`cannot negate ${key1}`);
+  //   }
+  //   if (negatedKey.length === 2) {
+  //     ref = Object.assign({}, variable.exec!.get(negatedKey[0])!);
+  //     ref.extraArg = variable.exec!.get(negatedKey[1])!.arg;
+  //     return { variable, ref };
+  //   } else if (negatedKey.length === 1) {
+  //     ref = variable.exec!.get(negatedKey)!;
+  //     return { variable, ref };
+  //   } else {
+  //     ref = variable.exec!.get(JSON.parse(negatedKey))!;
+  //     return { variable, ref };
+  //   }
+  // }
 
   #error(msg: string, node: ts.Node): never {
     const lineNum = ts.getLineAndCharacterOfPosition(
