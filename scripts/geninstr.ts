@@ -3,7 +3,7 @@
 // - `npx ts-node scripts/geninstr.ts`
 
 import * as fs from "fs";
-import { components, frames, items, gameValues, GameData } from "../data";
+import { components, frames, items, gameValues, instructions as dataInstructions, GameData } from "../data";
 import instrJson from "../instructions.json";
 import overrides from "./overrides.json";
 
@@ -88,9 +88,22 @@ interface CompileInfo {
   firstArgControlFlow?: boolean;
 }
 
-const { instructions } = instrJson as any as {
+let { instructions } = instrJson as any as {
   instructions: { [key: string]: InstrInfo };
 };
+
+// let instructions = instrJson as unknown as {
+//   [key: string]: InstrInfo
+// };
+
+// sort instructions
+instructions = Object.keys(instructions).sort().reduce(
+  (obj, key) => { 
+    obj[key] = instructions[key]; 
+    return obj;
+  }, 
+  {}
+);
 
 for (const op in instructions) {
   const inst = instructions[op as keyof typeof instructions];
@@ -453,13 +466,20 @@ interface String extends BaseValue {
 }
 interface Number extends BaseValue {}
 
-type Value = Coord | ItemNum | FrameNum | RadarFilter | Color | Extra;
+type Value = Coord | ItemNum | FrameNum | RadarFilter | ColorNum | ExtraNum;
 interface Coord extends BaseValue, Array<number> {}
 type CoordNum = Coord | number;
 
+interface NumPair<T> extends BaseValue {
+  id: T,
+  num: number
+}
+
+type ColorNum = Color | number | NumPair<Color>;
 type Color =
 ${toEnum(gameValues, e => e.tag === "color")};
 
+type ExtraNum = Extra | number | NumPair<Extra>;
 type Extra =
 ${toEnum(gameValues, e => e.tag === "value")};
 
@@ -467,49 +487,33 @@ type RadarFilter =
   | Resource
 ${toEnum(gameValues, e => e.tag === "entityfilter")};
 
+type ItemNum = Item | number | NumPair<Item>;
 type Item =
   | Comp
   | Resource
 ${toEnum(items, item => item.tag !== "resource")};
 
-interface ItemNumPair extends BaseValue {
-  id: Item,
-  num: number
-}
-
-type ItemNum = Item | number | ItemNumPair;
+type CompNum = Comp | number | NumPair<Comp>;
 type Comp =
 ${toEnum(components)};
 
-interface CompNumPair extends BaseValue {
-  id: Comp,
-  num: number
-}
-type CompNum = Comp | number | CompNumPair;
-
+type ResourceNum = Resource | number | NumPair<Resource>;
 type Resource =
 ${toEnum(items, item => item.tag === "resource")};
 
-interface ResourceNumPair extends BaseValue {
-  id: Resource;
-  num: number;
-}
-type ResourceNum = Resource | number | ResourceNumPair;
+type FrameNum = Frame | number | NumPair<Frame>;
 type Frame =
 ${toEnum(frames)};
 
-interface FrameNumPair extends BaseValue {
-  id: Frame;
-  num: number;
-}
-type FrameNum = Frame | number | FrameNumPair;
-
 declare function coord(x: number, y: number): Coord;
-declare function value(id: Comp, num: number): CompNumPair;
-declare function value(id: Item, num: number): ItemNumPair;
-declare function value(id: Resource, num: number): ResourceNumPair;
-declare function value(id: Frame, num: number): FrameNumPair;
+declare function value(id: Comp, num: number): NumPair<Comp>;
+declare function value(id: Item, num: number): NumPair<Item>;
+declare function value(id: Resource, num: number): NumPair<Resource>;
+declare function value(id: Frame, num: number): NumPair<Frame>;
+declare function value(id: Color, num: number): NumPair<Color>;
+declare function value(id: Extra, num: number): NumPair<Extra>;
 declare function label(value: Value, cb: () => void);
+declare function label(value: Value, continueOnReturn: boolean, cb: () => void);
 `;
 
 fs.writeFileSync("behavior.d.ts", dtsContents);

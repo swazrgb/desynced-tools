@@ -15,7 +15,7 @@ Promise.all([
     };
 
     function compile(filename: string, program: ts.SemanticDiagnosticsBuilderProgram) {
-        const asm = compileProgram(program.getProgram());
+        const asm = compileProgram(filename, program.getProgram());
 
         const dir = dirname(filename);
         const asmFilename = dir + "/out/" + basename(filename) + ".asm";
@@ -88,8 +88,12 @@ Promise.all([
         const origPostProgramCreate = host.afterProgramCreate;
 
         host.afterProgramCreate = program => {
-            compile(filename, program);
-            console.log("** We finished making the program! **");
+            try {
+                compile(filename, program);
+                console.log("** We finished making the program! **");
+            } catch(e) {
+                console.error(e);
+            }
 
             origPostProgramCreate!(program);
         };

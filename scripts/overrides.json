@@ -374,5 +374,13 @@
       "next": false,
       "Component Equipped": true
     }
+  },
+  "read_signal": {
+    "js": "signal",
+    "type": "property"
+  },
+  "get_location": {
+    "js": "location",
+    "type": "property"
   }
 }

@@ -1,7 +1,9 @@
-import componentJson from "./components.json";
-import itemJson from "./items.json";
-import frameJson from "./frames.json";
-import valuesJson from "./values.json";
+// import componentJson from "./components.json";
+// import itemJson from "./items.json";
+// import frameJson from "./frames.json";
+// import valuesJson from "./values.json";
+
+import data from "./game-data.json";
 
 type Type = "component" | "item" | "frame" | "value";
 
@@ -37,41 +39,50 @@ function load<E extends Element = Element, T extends Type = Type>(
 
     if (item.name != null) {
       if (item.name in allByName) {
-        delete item.name;
+        delete allByName[item.name].name;
+        allByName[item.name] = item;
       } else {
         allByName[item.name] = item;
       }
     }
   }
 
+  loaded.sort((a,b) => a.id.localeCompare(b.id));
+
   return loaded;
 }
 
 export const components = load<{
+  id: string;
   name?: string;
   attachment_size?: string;
-}>("component", componentJson["components"]);
+}>("component", data["components"]);
 
 export type Component = NonNullable<(typeof components)[number]>;
 
 export const frames = load<{
+  id: string;
   name?: string;
   size?: string;
-}>("frame", frameJson["frames"]);
+}>("frame", data["frames"]);
 
 export type Frame = NonNullable<(typeof frames)[number]>;
 
 export const items = load<{
+  id: string;
   name?: string;
   tag?: string;
-}>("item", itemJson["items"]);
+}>("item", data["items"]);
 
 export type Item = NonNullable<(typeof items)[number]>;
 
 export const gameValues = load<{
+  id: string;
   name?: string;
   tag?: string;
-}>("value", valuesJson["values"]);
+}>("value", data["values"]);
+
+export const instructions = data["instructions"];
 
 export type GameValue = NonNullable<(typeof gameValues)[number]>;
 

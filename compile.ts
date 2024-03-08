@@ -1,7 +1,8 @@
 // Copyright 2023 Ryan Brown
 
 import * as ts from "typescript";
-import {ModuleKind, ModuleResolutionKind} from "typescript";
+import {ModuleKind, ModuleResolutionKind, SyntaxKind} from "typescript";
+import * as tsApiUtils from "ts-api-utils";
 import {MethodInfo, methods, ops} from "./methods";
 import {Code} from "./ir/code";
 import {Arg, Instruction, Label, LiteralValue, RegRef, Stop, StringLiteral, VariableRef,} from "./ir/instruction";
@@ -58,7 +59,7 @@ function findParent<N extends ts.Node>(n: ts.Node, predicate: (n: ts.Node) => n 
   return parent as N;
 }
 
-function compileFile(sourceFiles: ts.SourceFile[]): string {
+function compileFile(mainFileName: string, sourceFiles: ts.SourceFile[]): string {
   const c = new Compiler();
   sourceFiles.forEach(f => {
     f.statements.forEach((n) => {
@@ -82,7 +83,7 @@ function compileFile(sourceFiles: ts.SourceFile[]): string {
 
   let mainSub;
   for (const sub of c.subs.values()) {
-    if (isExported(sub) && findParent(sub, ts.isSourceFile) === sourceFiles[0]) {
+    if (isExported(sub) && findParent(sub, ts.isSourceFile)?.fileName === mainFileName) {
       mainSub = sub;
       c.compileBehavior(sub, true);
     }
@@ -264,7 +265,7 @@ class Compiler {
   functionScopes: FunctionScope[] = [];
   currentScope: FunctionScope = new FunctionScope();
   haveBehavior = false;
-  userLabels: Array<{variable: Variable, body: ts.Block, scope: VariableScope}> = [];
+  userLabels: Array<{ variable: Variable, body: ts.Block, scope: VariableScope, retLabel?: string }> = [];
 
   constructor() {}
 
@@ -316,13 +317,19 @@ class Compiler {
       this.currentScope.addOutputParameter();
     }
     f.body?.statements.forEach(this.compileStatement.bind(this));
+    this.#rawEmit("nop");
     this.#rawEmit(".ret");
 
     for(const info of this.userLabels) {
+      this.#emitLabel(this.#label());
       this.currentScope.withVariableScope(info.scope, () => {
         this.#emit(methods.label, this.ref(info.variable, VariableOperations.Read));
         info.body.statements.forEach(this.compileStatement.bind(this));
       });
+
+      if (info.retLabel) {
+        this.#jump(info.retLabel);
+      }
 
       this.#rawEmit(".ret");
     }
@@ -511,7 +518,7 @@ class Compiler {
       this.#error("expected variable", init);
     }
     if (vars.length > 1) {
-      if (!Array.isArray(info.out) || vars.length >= info.out.length) {
+      if (!Array.isArray(info.out) || vars.length > info.out.length) {
         this.#error("too many variables", init);
       }
     }
@@ -936,6 +943,30 @@ class Compiler {
     }
   }
 
+  #parseLiteral(e: ts.Node): string | number | boolean {
+    if (ts.isStringLiteral(e)) {
+      return e.text;
+    } else if (ts.isNumericLiteral(e)) {
+      return Number(e.text);
+    } else if (ts.isPrefixUnaryExpression(e)) {
+      switch (e.operator) {
+        case ts.SyntaxKind.PlusToken:
+          return +this.#parseLiteral(e.operand);
+        case ts.SyntaxKind.MinusToken:
+          return -this.#parseLiteral(e.operand);
+        case ts.SyntaxKind.TildeToken:
+          return ~this.#parseLiteral(e.operand);
+        case ts.SyntaxKind.ExclamationToken:
+          return !this.#parseLiteral(e.operand);
+      }
+      this.#error(`Unsupported literal ${ts.SyntaxKind[e.kind]}: ${ts.SyntaxKind[e.operator]}`, e)
+    } else if (ts.isParenthesizedExpression(e)) {
+      return this.#parseLiteral(e.expression);
+    }
+
+    this.#error(`Unsupported literal ${ts.SyntaxKind[e.kind]}`, e)
+  }
+
   compileCall(
     e: ts.CallExpression,
     outs: (Variable | undefined)[] = []
@@ -961,25 +992,48 @@ class Compiler {
         } else {
           return new Variable(value ?? nilReg);
         }
-      } else if (name === "label" && e.arguments.length === 2) {
-        if(!ts.isFunctionLike(e.arguments[1])) {
-          this.#error("label argument 2 must be function", e.arguments[1]);
+      } else if (name === "label" && (e.arguments.length === 2 || e.arguments.length === 3)) {
+        let functionNode: ts.Node;
+        let continueOnFinishNode: ts.Node | null = null;
+
+        if (e.arguments.length === 2) {
+          functionNode = e.arguments[1];
+        } else {
+          continueOnFinishNode = e.arguments[1];
+          functionNode = e.arguments[2];
         }
 
-        if(!ts.isBlock(e.arguments[1].body)) {
-          this.#error("label argument 2 must be function block", e.arguments[1].body);
+        if (!ts.isFunctionLike(functionNode)) {
+          this.#error(`label argument 2 must be function: ${ts.SyntaxKind[functionNode.kind]}`, functionNode);
         }
 
-        if(e.arguments[1].parameters.length > 0) {
+        if (!("body" in functionNode) || functionNode.body == null || !ts.isBlock(functionNode.body)) {
+          this.#error("label argument 2 must be function block", functionNode['body'] ?? functionNode);
+        }
+
+        if (functionNode.parameters.length > 0) {
           this.#error("label callback may not have any parameters", e.arguments[1]);
         }
+
+        if (continueOnFinishNode != null && !tsApiUtils.isBooleanLiteral(continueOnFinishNode)) {
+          this.#error("continueOnFinish must be boolean literal", continueOnFinishNode);
+        }
+
+        const continueOnFinish = continueOnFinishNode == null ? false : tsApiUtils.isTrueLiteral(continueOnFinishNode);
+        let continueLabel = continueOnFinish ? this.#label() : undefined;
 
         const variable = this.compileExpr(e.arguments[0]);
         this.userLabels.push({
           variable,
-          body: e.arguments[1].body,
-          scope: this.currentScope.scope.newScope()
+          body: functionNode.body,
+          scope: this.currentScope.scope.newScope(),
+          retLabel: continueLabel
         });
+
+        if (continueLabel) {
+          this.#emitLabel(continueLabel);
+        }
+
         return new Variable(nilReg);
       } else if (this.inlined.has(name)) {
         const f = this.inlined.get(name);
@@ -990,10 +1044,12 @@ class Compiler {
         const args = e.arguments.map(a => {
           if (ts.isIdentifier(a)) {
             return {variable: a.text};
-          } else if (ts.isStringLiteral(a)) {
-            return {id: a.text}
-          } else if (ts.isNumericLiteral(a)) {
-            return {num: Number(a.text)};
+          }
+          const literal = this.#parseLiteral(a);
+          if (typeof literal === 'string') {
+            return {id: literal}
+          } else if (typeof literal === 'number') {
+            return {num: literal};
           } else {
             this.#error("Unsupported argument for inline call", a);
           }
@@ -1033,6 +1089,8 @@ class Compiler {
     } else if (ts.isPropertyAccessExpression(e.expression)) {
       name = e.expression.name.text;
       thisArg = e.expression.expression;
+    } else if (ts.isCallExpression(e.expression)) {
+      return this.compileCall(e.expression, outs);
     } else {
       this.#error(
         `unsupported call ${e.expression.kind} ${
@@ -1834,7 +1892,7 @@ export const CompilerOptions: ts.CompilerOptions = {
   module: ModuleKind.NodeNext
 };
 
-export function compileProgram(program: ts.Program): string {
+export function compileProgram(mainFileName: string, program: ts.Program): string {
   // TODO: ended up not using the typechecker. Should probably just parse
   // to reduce bundle size.
   ts.getPreEmitDiagnostics(program).forEach((diagnostic) => {
@@ -1871,7 +1929,7 @@ export function compileProgram(program: ts.Program): string {
   }
 
   try {
-    return compileFile(files);
+    return compileFile(mainFileName.replace(/\\/g, "/"), files);
   } catch (ex) {
     console.error(ex);
   }

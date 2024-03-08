@@ -4,7 +4,8 @@ import { ObjectToDesyncedString } from "./dsconvert";
 import { assemble } from "./assembler";
 
 const code = fs.readFileSync(process.argv[2], "utf8");
-assemble(code).then((obj) => {
+const obj = assemble(code);
+
   let typ = 'C'
   if ('frame' in obj) {
     typ = 'B';
@@ -15,4 +16,3 @@ assemble(code).then((obj) => {
     process.argv[2] + ".json",
     JSON.stringify(obj, undefined, 2)
   );
-});
