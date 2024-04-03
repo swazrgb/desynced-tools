@@ -48,3 +48,32 @@ jobs:
             dist
             website/bundle.out.js
             website/compiler.js
+      - run: mkdir website/monaco-editor-0.45.0/
+        if: ${{ matrix.node-version == '20.x' }}
+      - run: cp -r node_modules/monaco-editor/{LICENSE,min,min-maps} website/monaco-editor-0.45.0/
+        if: ${{ matrix.node-version == '20.x' }}
+      - name: Upload github pages
+        uses: actions/upload-pages-artifact@v3
+        if: ${{ matrix.node-version == '20.x' }}
+        with:
+          path: website
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 # or specific "vX.X.X" version tag for this action
